@@ -3624,10 +3624,9 @@ details-disclosure > details {
  
     min-height: auto;
 }
- .header__icon, .header__icon--cart .icon {
-    height: 4.4rem;
-    width: 4rem;
-    padding: 0;
+.header__icon, .header__icon--cart .icon {
+    width: 3rem;
+    padding: 0;
 }
 .section-header .header-wrapper--maison .header__heading-link .h2 {
     font-size: 22px;
