@@ -29,7 +29,7 @@
 
 /* Container */
 .mc-footer__container {
-  max-width: {% if section.settings.full_width %}100%{% else %}{{ section.settings.max_width }}px{% endif %};
+  {% comment %} max-width: {% if section.settings.full_width %}100%{% else %}{{ section.settings.max_width }}px{% endif %}; {% endcomment %}
   margin-left: auto;
   margin-right: auto;
   padding-left: {{ section.settings.padding_sides_desktop }}px;
