@@ -93,9 +93,7 @@
 
   .knr-faq__a p + p { margin-top: 8px; }
 
-  @media (max-width: 860px) {
-    .knr-faq { padding: 52px 20px; }
-  }
+
   button.knr-faq__q {
   font-family: 'Inter', sans-serif;
   font-weight: 400;
@@ -103,7 +101,7 @@
   font-size: 24px;
   line-height: 32px;
   letter-spacing: -0.04em; /* -4% */
-  text-align: left;
+  text-align: center;
   vertical-align: middle;
 }
 div#knrFaqitem_83RiKz {
@@ -121,7 +119,7 @@ div#knrFaqitem_83RiKz {
     letter-spacing: .06em;
     color: var(--knr-ink);
     margin: 0 0 40px;
-/
+
     font-family: 'Inter', sans-serif;
     font-weight: 400;
     font-style: normal;
@@ -131,6 +129,12 @@ div#knrFaqitem_83RiKz {
     text-align: center;
     vertical-align: middle;
 }
+  @media (max-width: 860px) {
+    .knr-faq { padding: 52px 20px; }
+    button.knr-faq__q{
+    text-align: left;
+    }
+  }
 </style>
 
 <section class="knr-faq">
