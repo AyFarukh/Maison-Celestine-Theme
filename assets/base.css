@@ -3600,6 +3600,9 @@ details-disclosure > details {
 .section-header .header-wrapper--maison {
     background: transparent;
 }
+.knr-pm {
+    margin-top: -90px;
+}
 
 
 /* Custom css for header */
