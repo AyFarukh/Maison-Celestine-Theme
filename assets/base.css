@@ -3597,6 +3597,11 @@ details-disclosure > details {
   }
 }
 
+.section-header .header-wrapper--maison {
+    background: transparent;
+}
+
+
 /* Custom css for header */
 @media(max-width:767px){
 
