@@ -5,7 +5,7 @@
     font-family: var(--knr-font);
     overflow: hidden;
     width: 100%;
-    max-width: {{ section.settings.section_max_width }}px;
+    {% comment %} max-width: {{ section.settings.section_max_width }}px; {% endcomment %}
     margin: 0 auto;
   }
 
@@ -328,7 +328,7 @@
 {%- assign ba_blocks = section.blocks | where: 'type', 'pair' -%}
 {%- assign quote_blocks = section.blocks | where: 'type', 'quote' -%}
 
-<section class="knr-ba page-width">
+<section class="knr-ba">
 
   <div class="knr-ba__hd">
     <h2 class="knr-ba__title">{{ section.settings.title }}</h2>
