@@ -3626,8 +3626,8 @@ details-disclosure > details {
     min-height: auto;
 }
 .header__icon, .header__icon--cart .icon {
-    width: 3rem;
-    padding: 0;
+    width: 3rem;
+    padding: 0;
 }
 .section-header .header-wrapper--maison .header__heading-link .h2 {
     font-size: 22px;
@@ -3649,18 +3649,19 @@ details-disclosure > details {
     left: 2.2rem;
     line-height: calc(1 + .1 / var(--font-body-scale));
 }
-.header__icon, .header__icon--cart .icon {
-    width: 3rem !important;
-    padding: 0;
-}
+
 .header__icon:not(.header__icon--summary), .header__icon span {
 
-    justify-content: flex-start !important;
+    justify-content: flex-start !important;
+}
+.cart-count-bubble {
+    bottom: 2.3rem;
+left: 1.0rem;
 }
 }
 .knr-pm__media-item[data-tag=“mobile-image”] {
-    display: none;
+  display: none;
 }
 html, body {
-    overflow-x: hidden;
+  overflow-x: hidden;
 }
