@@ -352,7 +352,14 @@
           </localization-form>
         {%- endif -%}
       </div>
-       {% render 'icon-location', size: 32, color: '#ffffff' %}
+    <a
+  href="{{ product.metafields.custom.google_map_url }}"
+  class="location-link"
+  target="_blank"
+  rel="noopener"
+>
+  {% render 'icon-location' %}
+</a>
 
       {%- if shop.customer_accounts_enabled -%}
         <a
