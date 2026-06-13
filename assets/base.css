@@ -3651,3 +3651,6 @@ details-disclosure > details {
 }
 
 }
+.knr-pm__media-item[data-tag=“mobile-image”] {
+    display: none;
+}

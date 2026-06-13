@@ -953,6 +953,7 @@
         {%- if media.media_type == 'video' or media.media_type == 'external_video' -%}
           {{- media | video_tag: autoplay: false, muted: true, loop: true, playsinline: true, image_size: '900x' -}}
         {%- else -%}
+          {%  unless media.alt == "desktop-image" %}
           <img
             src="{{ media | image_url: width: 900 }}"
             alt="{{ media.alt | default: product.title | escape }}"
@@ -960,6 +961,7 @@
             height="900"
             loading="{{ forloop.first | replace: 'true', 'eager' | replace: 'false', 'lazy' }}"
           >
+          {% endunless %}
         {%- endif -%}
       </div>
     {%- endfor -%}
