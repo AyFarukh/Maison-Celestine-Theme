@@ -1514,19 +1514,19 @@
                   >
                 {%- endif -%}
                 {%- if rv -%}
-              <button
-                class="knr-pm__ritual-qadd"
-                type="button"
-                data-ritual-add
-                data-vid="{{ rv.id }}"
-                data-product-id="{{ rp.id }}"
-                data-product-handle="{{ rp.handle }}"
-                data-product-title="{{ rp.title | escape }}"
-                data-default-label="+"
-                aria-label="Ajouter {{ rp.title | escape }}"
-              >
-                +
-              </button>
+            <button
+              class="knr-pm__ritual-qadd"
+              type="button"
+              data-ritual-add
+              data-vid="{{ product.selected_or_first_available_variant.id }}"
+              data-product-id="{{ product.id }}"
+              data-product-handle="{{ product.handle }}"
+              data-product-title="{{ product.title | escape }}"
+              data-default-label="+"
+              aria-label="Ajouter {{ product.title | escape }}"
+            >
+              +
+            </button>
                 {%- endif -%}
               </div>
               <div class="knr-pm__ritual-meta">
