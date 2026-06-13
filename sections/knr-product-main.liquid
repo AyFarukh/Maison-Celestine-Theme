@@ -953,6 +953,7 @@
         {%- if media.media_type == 'video' or media.media_type == 'external_video' -%}
           {{- media | video_tag: autoplay: false, muted: true, loop: true, playsinline: true, image_size: '900x' -}}
         {%- else -%}
+          {{media.alt }}
           {%  unless media.alt == "desktop-image" %}
           <img
             src="{{ media | image_url: width: 900 }}"
