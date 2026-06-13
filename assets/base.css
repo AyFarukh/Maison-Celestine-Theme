@@ -3632,7 +3632,7 @@ details-disclosure > details {
 .section-header .header-wrapper--maison .header__heading-link .h2 {
     font-size: 22px;
     position: relative;
-    left: -16px;
+    left: 0px;
 }
 .cart-count-bubble {
     position: absolute;
