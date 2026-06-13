@@ -3620,7 +3620,7 @@ details-disclosure > details {
     word-break: break-word;
 }
 .section-header .header-wrapper--maison .header {
-    padding-left: 0px;
+    padding-left: 0px !important;
  
     min-height: auto;
 }
