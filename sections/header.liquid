@@ -353,13 +353,27 @@
         {%- endif -%}
       </div>
     <a
-  href="{{ product.metafields.custom.google_map_url }}"
-  class="location-link"
-  target="_blank"
-  rel="noopener"
->
-  {% render 'icon-location' %}
-</a>
+      href="{{ product.metafields.custom.google_map_url }}"
+      class="location-link"
+      target="_blank"
+      rel="noopener"
+    >
+      {% render 'icon-location' %}
+    </a>
+
+    
+        <a
+          href="{{ product.metafields.custom.google_map_url }}"
+          class="header__icon header__icon--account link focus-inset{% if section.settings.menu != blank %} small-hide{% endif %}"
+          rel="nofollow"
+        >
+          
+            <account-icon>
+              {% render 'icon-location' %}
+            </account-icon>
+          
+        </a>
+     
 
       {%- if shop.customer_accounts_enabled -%}
         <a
