@@ -121,7 +121,7 @@
     bottom: 0;
     z-index: 20;
     transform: translateY(50%);
-    width: min({{ section.settings.card_width }}px, calc(100vw - 48px));
+    {% comment %} width: min({{ section.settings.card_width }}px, calc(100vw - 48px)); {% endcomment %}
     display: grid;
     grid-template-columns: {{ section.settings.card_image_width }}px minmax(0, 1fr) {{ section.settings.button_width }}px;
     gap: 18px;
@@ -174,8 +174,27 @@
     line-height: 1.2;
   }
 
-  #shopify-section-{{ section.id }} .knr-editorial__variant-options span:first-child {
-    border-bottom: 1px solid currentColor;
+  #shopify-section-{{ section.id }} .knr-editorial__variant-option {
+    appearance: none;
+    -webkit-appearance: none;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid transparent;
+    color: inherit;
+    cursor: pointer;
+    font: inherit;
+    line-height: inherit;
+    padding: 0 0 2px;
+    transition: opacity .18s ease, border-color .18s ease;
+  }
+
+  #shopify-section-{{ section.id }} .knr-editorial__variant-option.is-selected {
+    border-bottom-color: currentColor;
+  }
+
+  #shopify-section-{{ section.id }} .knr-editorial__variant-option[disabled] {
+    opacity: .34;
+    cursor: not-allowed;
   }
 
   #shopify-section-{{ section.id }} .knr-editorial__product-price {
@@ -192,8 +211,8 @@
 
   #shopify-section-{{ section.id }} .knr-editorial__atc {
     width: 100%;
-    height: 100%;
-    min-height: 60px;
+   
+    min-height: 56px;
     border: 0;
     background: {{ section.settings.button_bg }};
     color: {{ section.settings.button_text_color }};
@@ -306,7 +325,11 @@
   }
 </style>
 
-<section class="knr-editorial" data-knr-editorial>
+<section
+  class="knr-editorial"
+  data-knr-editorial
+  data-variants="{{ product.variants | json | escape }}"
+>
   <div class="knr-editorial__bg" aria-hidden="true">
     {%- if section.settings.bg_image != blank -%}
       <img
@@ -359,20 +382,30 @@
           <div class="knr-editorial__variant-options">
             {%- assign first_option = product.options_with_values.first -%}
             {%- for option_value in first_option.values limit: 2 -%}
-              <span>{{ option_value }}</span>
+              <button
+                class="knr-editorial__variant-option{% if first_option.selected_value == option_value %} is-selected{% endif %}"
+                type="button"
+                data-variant-option
+                data-option-index="0"
+                data-option-value="{{ option_value | escape }}"
+                aria-pressed="{% if first_option.selected_value == option_value %}true{% else %}false{% endif %}"
+              >
+                {{ option_value }}
+              </button>
             {%- endfor -%}
           </div>
         {%- endunless -%}
-        <p class="knr-editorial__product-price">{{ current_variant.price | money }}</p>
+        <p class="knr-editorial__product-price" data-product-price>{{ current_variant.price | money }}</p>
       </div>
 
       <form class="knr-editorial__product-form" id="{{ product_form_id }}" action="{{ routes.cart_add_url }}" method="post">
-        <input type="hidden" name="id" value="{{ current_variant.id }}">
+        <input type="hidden" name="id" value="{{ current_variant.id }}" data-variant-id-input>
         <input type="hidden" name="quantity" value="1">
         <button
           type="submit"
           name="add"
           class="knr-editorial__atc"
+          data-atc-button
           {% unless current_variant.available %}disabled{% endunless %}
         >
           {%- if current_variant.available -%}
@@ -390,8 +423,122 @@
   (() => {
     const section = document.currentScript.previousElementSibling;
     const form = section?.querySelector('.knr-editorial__product-form');
-    const button = section?.querySelector('.knr-editorial__atc');
-    if (!section || !form || !button) return;
+    const button = section?.querySelector('[data-atc-button]');
+    const variantIdInput = section?.querySelector('[data-variant-id-input]');
+    const priceEl = section?.querySelector('[data-product-price]');
+    const optionButtons = Array.from(section?.querySelectorAll('[data-variant-option]') || []);
+    if (!section || !form || !button || !variantIdInput) return;
+
+    const variants = JSON.parse(section.dataset.variants || '[]');
+    const moneyFormat = {{ shop.money_format | json }};
+    const defaultLabel = {{ section.settings.button_label | json }};
+    const soldOutLabel = {{ section.settings.sold_out_label | json }};
+    const addingLabel = {{ section.settings.adding_label | json }};
+    const addedLabel = {{ section.settings.added_label | json }};
+
+    let selectedOptions = [
+      {%- for opt in product.options_with_values -%}
+        {{ opt.selected_value | json }}{%- unless forloop.last -%},{%- endunless -%}
+      {%- endfor -%}
+    ];
+
+    const formatMoney = cents => {
+      if (typeof Shopify !== 'undefined' && typeof Shopify.formatMoney === 'function') {
+        return Shopify.formatMoney(cents, moneyFormat);
+      }
+
+      const amount = (Number(cents || 0) / 100).toFixed(2).replace('.', ',');
+      return `${amount} €`;
+    };
+
+    const getCartUi = () => document.querySelector('cart-notification') || document.querySelector('cart-drawer');
+
+    const openCartUi = cartUi => {
+      if (!cartUi) return;
+      if (typeof cartUi.open === 'function') {
+        cartUi.open();
+        return;
+      }
+      if (typeof cartUi.show === 'function') {
+        cartUi.show();
+      }
+    };
+
+    const syncCartCount = cart => {
+      const bubble = document.getElementById('cart-icon-bubble');
+      const countBubble = bubble?.querySelector('.cart-count-bubble');
+
+      if (!countBubble) return;
+
+      countBubble.classList.toggle('hidden', cart.item_count === 0);
+      countBubble.querySelectorAll('span').forEach(span => {
+        if (span.classList.contains('visually-hidden')) {
+          span.textContent = `Cart ${cart.item_count} items`;
+        } else {
+          span.textContent = cart.item_count;
+        }
+      });
+    };
+
+    const findVariant = options => variants.find(variant => variant.options.every((option, index) => option === options[index]));
+    const getSelectedVariant = () => findVariant(selectedOptions) || variants.find(variant => variant.available) || variants[0];
+
+    const updateOptionButtons = variant => {
+      optionButtons.forEach(optionButton => {
+        const optionIndex = Number(optionButton.dataset.optionIndex);
+        const optionValue = optionButton.dataset.optionValue;
+        const nextSelection = [...selectedOptions];
+        nextSelection[optionIndex] = optionValue;
+
+        const matchesVariant = variants.some(item => {
+          if (!item.available) return false;
+          return item.options.every((value, index) => value === nextSelection[index]);
+        });
+
+        const isSelected = variant?.options?.[optionIndex] === optionValue;
+        optionButton.classList.toggle('is-selected', isSelected);
+        optionButton.setAttribute('aria-pressed', String(isSelected));
+        optionButton.disabled = !matchesVariant;
+      });
+    };
+
+    const updateUi = () => {
+      const variant = getSelectedVariant();
+      if (!variant) return;
+
+      selectedOptions = [...variant.options];
+      variantIdInput.value = variant.id;
+
+      if (priceEl) {
+        priceEl.textContent = formatMoney(variant.price);
+      }
+
+      button.disabled = !variant.available;
+      button.textContent = variant.available ? defaultLabel : soldOutLabel;
+      updateOptionButtons(variant);
+    };
+
+    optionButtons.forEach(optionButton => {
+      optionButton.addEventListener('click', () => {
+        if (optionButton.disabled) return;
+
+        const optionIndex = Number(optionButton.dataset.optionIndex);
+        const optionValue = optionButton.dataset.optionValue;
+        const nextSelection = [...selectedOptions];
+        nextSelection[optionIndex] = optionValue;
+
+        let nextVariant = findVariant(nextSelection);
+        if (!nextVariant || !nextVariant.available) {
+          nextVariant = variants.find(variant => variant.available && variant.options[optionIndex] === optionValue);
+        }
+
+        if (!nextVariant) return;
+        selectedOptions = [...nextVariant.options];
+        updateUi();
+      });
+    });
+
+    updateUi();
 
     form.addEventListener('submit', async event => {
       event.preventDefault();
@@ -399,31 +546,59 @@
 
       const label = button.textContent;
       button.disabled = true;
-      button.textContent = '{{ section.settings.adding_label | escape }}';
+      button.textContent = addingLabel;
 
       try {
+        const cartUi = getCartUi();
+        const formData = new FormData();
+        formData.append('id', variantIdInput.value);
+        formData.append('quantity', String(Number(form.querySelector('[name="quantity"]').value || 1)));
+
+        if (cartUi && typeof cartUi.getSectionsToRender === 'function') {
+          formData.append(
+            'sections',
+            cartUi.getSectionsToRender().map(cartSection => cartSection.id).join(',')
+          );
+          formData.append('sections_url', window.location.pathname);
+          if (typeof cartUi.setActiveElement === 'function') {
+            cartUi.setActiveElement(button);
+          }
+        }
+
         const response = await fetch('/cart/add.js', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            id: Number(form.querySelector('[name="id"]').value),
-            quantity: Number(form.querySelector('[name="quantity"]').value || 1)
-          })
+          headers: {
+            Accept: 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: formData
         });
 
         if (!response.ok) throw new Error('Cart add failed');
 
+        const addResponse = await response.json();
+        if (cartUi && addResponse.sections && typeof cartUi.renderContents === 'function') {
+          cartUi.renderContents(addResponse);
+        } else {
+          openCartUi(cartUi);
+        }
+
         const cart = await (await fetch('/cart.js')).json();
+        syncCartCount(cart);
         document.dispatchEvent(new CustomEvent('knr:cart:updated', { detail: cart, bubbles: true }));
-        button.textContent = '{{ section.settings.added_label | escape }}';
+        button.textContent = addedLabel;
 
         setTimeout(() => {
-          button.disabled = false;
-          button.textContent = label;
+          updateUi();
+          if (!button.disabled) {
+            button.textContent = label;
+          }
         }, 1500);
       } catch (error) {
-        button.disabled = false;
-        button.textContent = label;
+        updateUi();
+        if (!button.disabled) {
+          button.textContent = label;
+        }
       }
     });
   })();

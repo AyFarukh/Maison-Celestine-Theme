@@ -530,6 +530,7 @@
     },
     "main_product_custom_3HjkmM": {
       "type": "main-product-custom",
+      "disabled": true,
       "blocks": {
         "breadcrumb_qgBPMV": {
           "type": "breadcrumb",

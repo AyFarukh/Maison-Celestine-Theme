@@ -58,6 +58,7 @@
   }
 
   .knr-pm__hero {
+    position: relative;
     overflow: hidden;
     background: var(--knr-sand-dark);
     flex-shrink: 0;
@@ -101,6 +102,80 @@
   }
 
   .knr-pm__media-item:hover img { transform: scale(1.04); }
+
+  .knr-pm__image-qadd,
+  .knr-pm__ritual-qadd {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    width: 28px;
+    height: 28px;
+    background: #ffffff;
+    border: 1px solid rgba(17, 17, 17, .14);
+    border-radius: 0;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    line-height: 1;
+    color: #111111;
+    transition: background-color .15s ease, color .15s ease, border-color .15s ease, transform .15s ease;
+    padding: 0;
+    font-family: var(--knr-font);
+    z-index: 4;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  .knr-pm__image-qadd {
+    border-radius: 0;
+  }
+
+  {% comment %} .knr-pm__ritual-qadd {
+    width: 50px;
+    height: 50px;
+    right: 14px;
+    bottom: 16px;
+    border-radius: 999px;
+    box-shadow: 0 10px 24px rgba(17, 17, 17, .14);
+    font-size: 26px;
+    line-height: 1;
+    touch-action: manipulation;
+  } {% endcomment %}
+
+  .knr-pm__image-qadd:hover,
+  .knr-pm__ritual-qadd:hover {
+    background: #111111;
+    border-color: #111111;
+    color: #ffffff;
+    transform: translateY(-1px);
+  }
+
+  .knr-pm__image-qadd.loading,
+  .knr-pm__ritual-qadd.loading {
+    pointer-events: none;
+    color: #111111;
+    background: #ffffff;
+    transform: none;
+  }
+
+  .knr-pm__image-qadd.added,
+  .knr-pm__ritual-qadd.added {
+    background: #111111;
+    border-color: #111111;
+    color: #ffffff;
+  }
+
+  .knr-pm__quick-add-spinner {
+    width: 11px;
+    height: 11px;
+    border: 1.5px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    display: inline-block;
+    animation: knrPmSpin .55s linear infinite;
+  }
 
   .knr-pm__zoom-icon {
     position: absolute;
@@ -313,22 +388,22 @@
   }
 
   .knr-pm__badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 36px;
-    background: var(--knr-pm-badge-bg);
-    border-radius: 3px;
-    font-size: 11px;
-    font-weight: 400;
-    letter-spacing: 0;
-    text-transform: uppercase;
-    color: var(--knr-pm-badge-text);
-    border: 1px solid var(--knr-pm-badge-border);
-    padding: 7px 12px;
-    line-height: 1;
-    white-space: nowrap;
-    transition: background-color .2s ease, color .2s ease, border-color .2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 30px;
+      background: var(--knr-pm-badge-bg);
+      border-radius: 3px;
+      font-size: 12px;
+      font-weight: 400;
+      letter-spacing: 0;
+      text-transform: uppercase;
+      color: var(--knr-pm-badge-text);
+      border: 1px solid var(--knr-pm-badge-border);
+      padding: 6px 12px;
+      line-height: 1;
+      white-space: nowrap;
+      transition: background-color .2s ease, color .2s ease, border-color .2s ease;
   }
 
   .knr-pm__badge:hover {
@@ -511,6 +586,8 @@
     justify-content: center;
     gap: 10px;
     transition: background-color .2s, color .2s;
+    position: relative;
+    z-index: 2;
   }
 
   .knr-pm__atc:hover:not(:disabled) {
@@ -533,6 +610,17 @@
 
   .knr-pm__atc.loading .knr-pm__atc-spinner { display: block; }
   .knr-pm__atc.loading .knr-pm__atc-lbl { display: none; }
+
+  .knr-pm__feedback {
+    margin: 10px 0 0;
+    font-size: 11px;
+    line-height: 1.5;
+    color: #111111;
+  }
+
+  .knr-pm__feedback.is-error {
+    color: #8d2f2f;
+  }
 
   @keyframes knrPmSpin { to { transform: rotate(360deg); } }
 
@@ -753,35 +841,8 @@
 
   .knr-pm__ritual-card:hover .knr-pm__ritual-img img { transform: scale(1.04); }
 
-  .knr-pm__ritual-qadd {
-    position: absolute;
-    bottom: 8px;
-    right: 8px;
-    width: 26px;
-    height: 26px;
-    background: var(--knr-cream);
-    border: 1px solid var(--knr-border);
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    line-height: 1;
-    color: var(--knr-ink);
-    transition: background-color .15s, border-color .15s, color .15s;
-    padding: 0;
-    font-family: var(--knr-font);
-  }
-
-  .knr-pm__ritual-qadd:hover {
-    background: var(--knr-ink);
-    border-color: var(--knr-ink);
-    color: var(--knr-cream);
-  }
-
-  .knr-pm__ritual-qadd.loading { opacity: .5; pointer-events: none; }
-  .knr-pm__ritual-qadd.added   { background: var(--knr-ink); border-color: var(--knr-ink); color: var(--knr-cream); }
+  .knr-pm__ritual-qadd.loading,
+  .knr-pm__ritual-qadd.added { opacity: 1; }
 
   .knr-pm__ritual-name {
     font-size: 11px;
@@ -926,6 +987,9 @@
   id="knrPmSection-{{ section.id }}"
   class="knr-pm{% if section.settings.info_position == 'left' %} knr-pm--info-left{% endif %}"
   style="--knr-pm-gap: {{ section.settings.image_gap }}px; --knr-pm-badge-bg: {{ section.settings.info_badge_bg_color }}; --knr-pm-badge-text: {{ section.settings.info_badge_text_color }}; --knr-pm-badge-border: {{ section.settings.info_badge_border_color }};"
+  data-variants="{{ product.variants | json | escape }}"
+  data-dynamic-bg="{{ section.settings.dynamic_bg }}"
+  data-dynamic-bg-opacity="{{ section.settings.dynamic_bg_opacity | divided_by: 100.0 }}"
 >
 
   <!-- ─ Gallery ─ -->
@@ -946,6 +1010,12 @@
           data-lb="{{ hero | image_url: width: 2400 }}"
         >
       {%- endif -%}
+      <button
+        type="button"
+        class="knr-pm__image-qadd"
+        data-main-image-add
+        aria-label="Ajouter {{ product.title | escape }} au panier"
+      >+</button>
     </div>
 
     {%- if product.media.size > 1 -%}
@@ -962,6 +1032,12 @@
                 loading="lazy"
               >
             {%- endif -%}
+            <button
+              type="button"
+              class="knr-pm__image-qadd"
+              data-main-image-add
+              aria-label="Ajouter {{ product.title | escape }} au panier"
+            >+</button>
             <span class="knr-pm__zoom-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             </span>
@@ -1070,17 +1146,17 @@
     {%- endif -%}
 
     <!-- Price -->
-    <div id="knrPmPriceBlock">
+    <div id="knrPmPriceBlock-{{ section.id }}">
       <div class="knr-pm__price-row">
-        <span class="knr-pm__price" id="knrPmPrice">{{ current_variant.price | money }}</span>
+        <span class="knr-pm__price" id="knrPmPrice-{{ section.id }}">{{ current_variant.price | money }}</span>
         {%- if current_variant.compare_at_price > current_variant.price -%}
-          <span class="knr-pm__compare" id="knrPmCompare">{{ current_variant.compare_at_price | money }}</span>
+          <span class="knr-pm__compare" id="knrPmCompare-{{ section.id }}">{{ current_variant.compare_at_price | money }}</span>
         {%- else -%}
-          <span class="knr-pm__compare" id="knrPmCompare" hidden></span>
+          <span class="knr-pm__compare" id="knrPmCompare-{{ section.id }}" hidden></span>
         {%- endif -%}
       </div>
       {%- if current_variant.unit_price_measurement -%}
-        <p class="knr-pm__unit-price" id="knrPmUnitPrice">
+        <p class="knr-pm__unit-price" id="knrPmUnitPrice-{{ section.id }}">
           {{ current_variant.unit_price | money }}
           {%- if current_variant.unit_price_measurement.reference_value != 1 -%}
             {{ current_variant.unit_price_measurement.reference_value }}
@@ -1088,20 +1164,20 @@
           {{ current_variant.unit_price_measurement.reference_unit }}
         </p>
       {%- else -%}
-        <p class="knr-pm__unit-price" id="knrPmUnitPrice" hidden></p>
+        <p class="knr-pm__unit-price" id="knrPmUnitPrice-{{ section.id }}" hidden></p>
       {%- endif -%}
     </div>
 
     <!-- Add to cart -->
     <div class="knr-pm__atc-wrap">
       <form id="{{ product_form_id }}" action="{{ routes.cart_add_url }}" method="post" novalidate>
-        <input type="hidden" name="id" id="knrPmVarId" value="{{ current_variant.id }}">
+        <input type="hidden" name="id" id="knrPmVarId-{{ section.id }}" value="{{ current_variant.id }}">
         <input type="hidden" name="quantity" value="1">
         <button
           type="submit"
           name="add"
           class="knr-pm__atc"
-          id="knrPmAtcBtn"
+          id="knrPmAtcBtn-{{ section.id }}"
           {%- unless current_variant.available %} disabled{%- endunless -%}
         >
           <span class="knr-pm__atc-spinner" aria-hidden="true"></span>
@@ -1110,6 +1186,7 @@
           </span>
         </button>
       </form>
+      <p class="knr-pm__feedback" id="knrPmFeedback-{{ section.id }}" aria-live="polite" hidden></p>
     </div>
 
     <!-- Delivery message -->
@@ -1196,14 +1273,23 @@
           <h2 class="knr-pm__ritual-title">
             {{ section.settings.ritual_title | default: 'Complétez votre rituel' }}
           </h2>
-          <button class="knr-pm__ritual-next" id="knrRitualNext" aria-label="Suivant">
+          <button class="knr-pm__ritual-next" id="knrRitualNext-{{ section.id }}" aria-label="Suivant">
             <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
           </button>
         </div>
 
-        <div class="knr-pm__ritual-track" id="knrRitualTrack" role="list">
+        <div class="knr-pm__ritual-track" id="knrRitualTrack-{{ section.id }}" role="list">
           {%- for rp in ritual_prods -%}
-            {%- assign rv = rp.selected_or_first_available_variant -%}
+            {%- assign rv = blank -%}
+            {%- for ritual_variant in rp.variants -%}
+              {%- if ritual_variant.available -%}
+                {%- assign rv = ritual_variant -%}
+                {%- break -%}
+              {%- endif -%}
+            {%- endfor -%}
+            {%- if rv == blank -%}
+              {%- assign rv = rp.variants.first -%}
+            {%- endif -%}
             <div class="knr-pm__ritual-card" role="listitem">
               <div class="knr-pm__ritual-img">
                 {%- if rp.featured_media -%}
@@ -1214,13 +1300,20 @@
                     loading="lazy"
                   >
                 {%- endif -%}
-                <button
-                  class="knr-pm__ritual-qadd"
-                  type="button"
-                  data-vid="{{ rv.id }}"
-                  aria-label="Ajouter {{ rp.title | escape }}"
-                  {%- unless rv.available %} disabled{%- endunless -%}
-                >+</button>
+                {%- if rv -%}
+                  <button
+                    class="knr-pm__ritual-qadd"
+                    type="button"
+                    data-ritual-add
+                    data-vid="{{ rv.id }}"
+                    data-product-id="{{ rp.id }}"
+                    data-product-handle="{{ rp.handle }}"
+                    data-product-title="{{ rp.title | escape }}"
+                    data-default-label="+"
+                    aria-label="Ajouter {{ rp.title | escape }}"
+                    {%- unless rv.available %} disabled{%- endunless -%}
+                  >+</button>
+                {%- endif -%}
               </div>
               <p class="knr-pm__ritual-name">{{ rp.title }}</p>
               <p class="knr-pm__ritual-price">
@@ -1240,144 +1333,422 @@
 
 <!-- Lightbox -->
 <div class="knr-pm__lb" id="knrPmLb" role="dialog" aria-modal="true" aria-label="Vue agrandie">
-  <button class="knr-pm__lb-close" id="knrPmLbClose" aria-label="Fermer">&times;</button>
-  <img src="{{ product.featured_image | image_url: width: 1200 }}" alt="{{ product.title | escape }}" id="knrPmLbImg" width="1200" height="1200" loading="lazy">
+  <button class="knr-pm__lb-close" id="knrPmLbClose-{{ section.id }}" aria-label="Fermer">&times;</button>
+  <img src="{{ product.featured_image | image_url: width: 1200 }}" alt="{{ product.title | escape }}" id="knrPmLbImg-{{ section.id }}" width="1200" height="1200" loading="lazy">
 </div>
-
-<script type="application/json" id="knrPmVariantData">{{ product.variants | json }}</script>
 
 <script>
   (() => {
-    const variants = JSON.parse(document.getElementById('knrPmVariantData').textContent);
-    const selectedOpts = [
+    const sectionEl = document.getElementById('knrPmSection-{{ section.id }}');
+    if (!sectionEl) return;
+
+    const variants = JSON.parse(sectionEl.dataset.variants || '[]');
+    let selectedOpts = [
       {%- for opt in product.options_with_values -%}
         {{ opt.selected_value | json }}{%- unless forloop.last -%},{%- endunless -%}
       {%- endfor -%}
     ];
 
-    const findVariant = () => variants.find(v => v.options.every((o, i) => o === selectedOpts[i]));
+    const moneyFormat = {{ shop.money_format | json }};
+    const mainAtcBtn = sectionEl.querySelector('#knrPmAtcBtn-{{ section.id }}');
+    const feedbackEl = sectionEl.querySelector('#knrPmFeedback-{{ section.id }}');
+    let feedbackTimer = null;
+
+    const findVariantByOptions = options => variants.find(variant => variant.options.every((option, index) => option === options[index]));
+    const getSelectedVariant = () => findVariantByOptions(selectedOpts) || variants.find(variant => variant.available) || variants[0];
+    const getCartUi = () => document.querySelector('cart-notification') || document.querySelector('cart-drawer');
+
+    if (mainAtcBtn && document.querySelector('cart-drawer')) {
+      mainAtcBtn.setAttribute('aria-haspopup', 'dialog');
+    }
 
     const fmtMoney = cents => {
+      if (typeof Shopify !== 'undefined' && typeof Shopify.formatMoney === 'function') {
+        return Shopify.formatMoney(cents, moneyFormat);
+      }
+
       const amt = (cents / 100).toFixed(2).replace('.', ',');
       return amt + ' €';
     };
 
-    const updateUI = () => {
-      const v = findVariant();
-      if (!v) return;
+    const setFeedback = (message, type = 'success') => {
+      if (!feedbackEl) return;
 
-      // price
-      const priceEl   = document.getElementById('knrPmPrice');
-      const compareEl = document.getElementById('knrPmCompare');
-      const unitEl    = document.getElementById('knrPmUnitPrice');
-      if (priceEl)   priceEl.textContent = fmtMoney(v.price);
+      window.clearTimeout(feedbackTimer);
+
+      if (!message) {
+        feedbackEl.hidden = true;
+        feedbackEl.textContent = '';
+        feedbackEl.classList.remove('is-error');
+        return;
+      }
+
+      feedbackEl.hidden = false;
+      feedbackEl.textContent = message;
+      feedbackEl.classList.toggle('is-error', type === 'error');
+
+      feedbackTimer = window.setTimeout(() => {
+        feedbackEl.hidden = true;
+        feedbackEl.textContent = '';
+        feedbackEl.classList.remove('is-error');
+      }, 2600);
+    };
+
+    const syncHeaderCount = cart => {
+      const bubble = document.getElementById('cart-icon-bubble');
+      const countBubble = bubble?.querySelector('.cart-count-bubble');
+      const badge = document.getElementById('knrCartCount');
+
+      if (badge) {
+        badge.textContent = cart.item_count;
+        badge.dataset.empty = cart.item_count === 0 ? 'true' : 'false';
+      }
+
+      if (!countBubble) return;
+
+      countBubble.classList.toggle('hidden', cart.item_count === 0);
+      countBubble.querySelectorAll('span').forEach(span => {
+        if (span.classList.contains('visually-hidden')) {
+          span.textContent = `Cart ${cart.item_count} items`;
+        } else {
+          span.textContent = cart.item_count;
+        }
+      });
+    };
+
+    const dispatchCartUpdate = cart => {
+      syncHeaderCount(cart);
+      document.dispatchEvent(new CustomEvent('knr:cart:updated', { detail: cart, bubbles: true }));
+    };
+
+    const fetchCartState = async () => {
+      const response = await fetch('{{ routes.cart_url }}.js', {
+        headers: { Accept: 'application/json' }
+      });
+      if (!response.ok) throw new Error('cart fetch failed');
+      return response.json();
+    };
+
+    const openCartUi = cartUi => {
+      if (!cartUi) return;
+      if (typeof cartUi.open === 'function') {
+        cartUi.open();
+        return;
+      }
+      if (typeof cartUi.show === 'function') {
+        cartUi.show();
+      }
+    };
+
+    const renderCartUpdate = async (addResponse, triggerEl) => {
+      const cartUi = getCartUi();
+
+      if (cartUi && addResponse.sections && typeof cartUi.renderContents === 'function') {
+        if (triggerEl && typeof cartUi.setActiveElement === 'function') {
+          cartUi.setActiveElement(triggerEl);
+        }
+        cartUi.renderContents(addResponse);
+      } else {
+        openCartUi(cartUi);
+      }
+
+      const cart = await fetchCartState();
+      dispatchCartUpdate(cart);
+      return cart;
+    };
+
+    const addVariantToCart = async (variantId, options = {}) => {
+      const {
+        quantity = 1,
+        triggerEl = null,
+        successMessage = 'Produit ajouté au panier.'
+      } = options;
+
+      const cartUi = getCartUi();
+      const formData = new FormData();
+      formData.append('id', String(variantId));
+      formData.append('quantity', String(quantity));
+
+      if (cartUi && typeof cartUi.getSectionsToRender === 'function') {
+        formData.append(
+          'sections',
+          cartUi.getSectionsToRender().map(section => section.id).join(',')
+        );
+        formData.append('sections_url', window.location.pathname);
+        if (triggerEl && typeof cartUi.setActiveElement === 'function') {
+          cartUi.setActiveElement(triggerEl);
+        }
+      }
+
+      const response = await fetch('{{ routes.cart_add_url }}.js', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: formData
+      });
+
+      const data = await response.json();
+      if (!response.ok || data.status) {
+        throw new Error(data.description || data.message || 'Cart add failed');
+      }
+
+      const cart = await renderCartUpdate(data, triggerEl);
+      if (!cartUi) setFeedback(successMessage);
+      return { data, cart };
+    };
+
+    const setQuickAddState = (button, state) => {
+      if (!button.dataset.defaultLabel) {
+        button.dataset.defaultLabel = button.textContent.trim() || '+';
+      }
+
+      button.classList.remove('loading', 'added');
+      button.setAttribute('aria-busy', state === 'loading' ? 'true' : 'false');
+
+      if (state === 'loading') {
+        button.classList.add('loading');
+        button.innerHTML = '<span class="knr-pm__quick-add-spinner" aria-hidden="true"></span>';
+        return;
+      }
+
+      if (state === 'added') {
+        button.classList.add('added');
+        button.textContent = '✓';
+        return;
+      }
+
+      button.textContent = button.dataset.defaultLabel;
+    };
+
+    const updateOptionButtons = () => {
+      sectionEl.querySelectorAll('.knr-pm__opt-pill').forEach(button => {
+        const optionIndex = Number(button.dataset.opt);
+        const buttonValue = button.dataset.val;
+        const nextSelection = [...selectedOpts];
+        nextSelection[optionIndex] = buttonValue;
+
+        const isActive = selectedOpts[optionIndex] === buttonValue;
+        const isAvailable = variants.some(variant => {
+          if (!variant.available) return false;
+          return variant.options.every((optionValue, index) => optionValue === nextSelection[index]);
+        });
+
+        button.classList.toggle('is-selected', isActive);
+        button.disabled = !isAvailable;
+        button.setAttribute('aria-pressed', String(isActive));
+        button.setAttribute('aria-disabled', String(!isAvailable));
+      });
+    };
+
+    const updateUI = () => {
+      const variant = getSelectedVariant();
+      if (!variant) return;
+
+      selectedOpts = [...variant.options];
+      updateOptionButtons();
+
+      const priceEl = sectionEl.querySelector('#knrPmPrice-{{ section.id }}');
+      const compareEl = sectionEl.querySelector('#knrPmCompare-{{ section.id }}');
+      const unitEl = sectionEl.querySelector('#knrPmUnitPrice-{{ section.id }}');
+      const varInput = sectionEl.querySelector('#knrPmVarId-{{ section.id }}');
+      const atcLbl = mainAtcBtn?.querySelector('.knr-pm__atc-lbl');
+
+      if (priceEl) priceEl.textContent = fmtMoney(variant.price);
+
       if (compareEl) {
-        if (v.compare_at_price && v.compare_at_price > v.price) {
-          compareEl.textContent = fmtMoney(v.compare_at_price);
+        if (variant.compare_at_price && variant.compare_at_price > variant.price) {
+          compareEl.textContent = fmtMoney(variant.compare_at_price);
           compareEl.hidden = false;
         } else {
           compareEl.hidden = true;
+          compareEl.textContent = '';
         }
       }
-      if (unitEl) unitEl.hidden = !v.unit_price_measurement;
 
-      // form + button
-      const varInput = document.getElementById('knrPmVarId');
-      const atcBtn   = document.getElementById('knrPmAtcBtn');
-      const atcLbl   = atcBtn?.querySelector('.knr-pm__atc-lbl');
-      if (varInput) varInput.value   = v.id;
-      if (atcBtn)   atcBtn.disabled  = !v.available;
-      if (atcLbl)   atcLbl.textContent = v.available ? 'Ajouter au panier' : 'Indisponible';
+      if (unitEl) {
+        if (variant.unit_price_measurement) {
+          const refValue = variant.unit_price_measurement.reference_value;
+          const refUnit = variant.unit_price_measurement.reference_unit || '';
+          const refText = `${refValue && refValue !== 1 ? refValue : ''}${refUnit}`;
+          unitEl.textContent = `${fmtMoney(variant.unit_price)}${refText ? ` / ${refText}` : ''}`;
+          unitEl.hidden = false;
+        } else {
+          unitEl.hidden = true;
+          unitEl.textContent = '';
+        }
+      }
 
-      // url
-      const u = new URL(window.location.href);
-      u.searchParams.set('variant', v.id);
-      window.history.replaceState({}, '', u);
+      if (varInput) varInput.value = variant.id;
+      if (mainAtcBtn) {
+        mainAtcBtn.disabled = !variant.available;
+        mainAtcBtn.removeAttribute('aria-disabled');
+      }
+      if (atcLbl) atcLbl.textContent = variant.available ? 'Ajouter au panier' : 'Indisponible';
+
+      const url = new URL(window.location.href);
+      url.searchParams.set('variant', variant.id);
+      window.history.replaceState({}, '', url);
+    };
+
+    const selectVariantFromOption = (optionIndex, optionValue) => {
+      const nextSelection = [...selectedOpts];
+      nextSelection[optionIndex] = optionValue;
+
+      let nextVariant = findVariantByOptions(nextSelection);
+      if (!nextVariant || !nextVariant.available) {
+        nextVariant =
+          variants.find(variant => {
+            if (!variant.available || variant.options[optionIndex] !== optionValue) return false;
+            return nextSelection.every((selectedValue, index) => index === optionIndex || selectedValue === variant.options[index]);
+          }) ||
+          variants.find(variant => variant.available && variant.options[optionIndex] === optionValue);
+      }
+
+      if (!nextVariant) return;
+      selectedOpts = [...nextVariant.options];
+      updateUI();
     };
 
     // Variant pills
-    document.querySelectorAll('.knr-pm__opt-pill').forEach(btn => {
+    sectionEl.querySelectorAll('.knr-pm__opt-pill').forEach(btn => {
       btn.addEventListener('click', () => {
         if (btn.disabled) return;
-        const pos = +btn.dataset.opt;
-        selectedOpts[pos] = btn.dataset.val;
-        btn.closest('.knr-pm__option-pills').querySelectorAll('.knr-pm__opt-pill').forEach(b => {
-          const active = b.dataset.val === btn.dataset.val;
-          b.classList.toggle('is-selected', active);
-          b.setAttribute('aria-pressed', String(active));
-        });
-        updateUI();
+        selectVariantFromOption(Number(btn.dataset.opt), btn.dataset.val);
       });
     });
 
     // ATC — main form
-    const pmForm = document.getElementById('{{ product_form_id }}');
+    updateUI();
+
+    const pmForm = sectionEl.querySelector('#{{ product_form_id }}');
     if (pmForm) {
       pmForm.addEventListener('submit', async e => {
         e.preventDefault();
-        const btn = document.getElementById('knrPmAtcBtn');
+        const btn = sectionEl.querySelector('#knrPmAtcBtn-{{ section.id }}');
         const lbl = btn?.querySelector('.knr-pm__atc-lbl');
         const origText = lbl?.textContent;
+        if (!btn || btn.disabled) return;
+
         btn.classList.add('loading');
         btn.disabled = true;
+        btn.setAttribute('aria-disabled', 'true');
+        setFeedback('');
+        if (lbl) lbl.textContent = 'Ajout...';
 
         try {
-          const res = await fetch('/cart/add.js', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: document.getElementById('knrPmVarId').value, quantity: 1 })
+          await addVariantToCart(sectionEl.querySelector('#knrPmVarId-{{ section.id }}')?.value, {
+            triggerEl: btn,
+            successMessage: 'Produit ajouté au panier.'
           });
-          if (!res.ok) throw new Error('add failed');
-          const cart = await (await fetch('/cart.js')).json();
-          document.dispatchEvent(new CustomEvent('knr:cart:updated', { detail: cart, bubbles: true }));
           if (lbl) lbl.textContent = 'Ajouté ✓';
           setTimeout(() => {
-            if (lbl) lbl.textContent = origText;
-            btn.disabled = false;
+            if (lbl) lbl.textContent = origText || 'Ajouter au panier';
+            updateUI();
           }, 2200);
-        } catch (_) {
+        } catch (error) {
           btn.disabled = false;
+          btn.removeAttribute('aria-disabled');
+          if (lbl) lbl.textContent = origText || 'Ajouter au panier';
+          setFeedback(error.message || 'Impossible d’ajouter ce produit.', 'error');
         }
 
         btn.classList.remove('loading');
       });
     }
 
-    // Ritual quick-add
-    document.querySelectorAll('.knr-pm__ritual-qadd').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        if (btn.disabled || btn.classList.contains('loading')) return;
-        btn.classList.add('loading');
-        const origContent = btn.innerHTML;
-        btn.innerHTML = '<span style="width:10px;height:10px;border:1.5px solid currentColor;border-top-color:transparent;border-radius:50%;display:inline-block;animation:knrPmSpin .55s linear infinite;vertical-align:middle"></span>';
+    // Main gallery quick-add
+    sectionEl.querySelectorAll('[data-main-image-add]').forEach(button => {
+      button.dataset.defaultLabel = '+';
+      button.addEventListener('click', async event => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (button.classList.contains('loading')) return;
+
+        const variant = getSelectedVariant();
+        if (!variant || !variant.available) {
+          setFeedback('Cette variante est indisponible.', 'error');
+          return;
+        }
+
+        setQuickAddState(button, 'loading');
 
         try {
-          await fetch('/cart/add.js', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: btn.dataset.vid, quantity: 1 })
+          await addVariantToCart(variant.id, {
+            triggerEl: button,
+            successMessage: 'Produit ajouté au panier.'
           });
-          const cart = await (await fetch('/cart.js')).json();
-          document.dispatchEvent(new CustomEvent('knr:cart:updated', { detail: cart, bubbles: true }));
-          btn.innerHTML = '✓';
-          btn.classList.add('added');
-          setTimeout(() => {
-            btn.innerHTML = origContent;
-            btn.classList.remove('loading', 'added');
-          }, 2000);
-        } catch (_) {
-          btn.innerHTML = origContent;
-          btn.classList.remove('loading');
+          setQuickAddState(button, 'added');
+          window.setTimeout(() => setQuickAddState(button, 'idle'), 1800);
+        } catch (error) {
+          setQuickAddState(button, 'idle');
+          setFeedback(error.message || 'Impossible d’ajouter ce produit.', 'error');
         }
       });
     });
 
+    // Ritual quick-add
+    const bindRitualQuickAdd = btn => {
+      let lastTouchTriggerAt = 0;
+
+      const handleRitualQuickAdd = async event => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (event.type === 'click' && Date.now() - lastTouchTriggerAt < 450) {
+          return;
+        }
+
+        if (event.type === 'pointerup' && event.pointerType !== 'mouse') {
+          lastTouchTriggerAt = Date.now();
+        }
+
+        if (btn.disabled || btn.classList.contains('loading')) return;
+        if (!btn.dataset.vid) {
+          setFeedback('Produit indisponible.', 'error');
+          return;
+        }
+
+        setQuickAddState(btn, 'loading');
+
+        try {
+          await addVariantToCart(btn.dataset.vid, {
+            triggerEl: btn,
+            successMessage: `${btn.dataset.productTitle || 'Produit'} ajouté au panier.`
+          });
+          setQuickAddState(btn, 'added');
+          setTimeout(() => setQuickAddState(btn, 'idle'), 2000);
+        } catch (error) {
+          setQuickAddState(btn, 'idle');
+          setFeedback(error.message || 'Impossible d’ajouter ce produit.', 'error');
+        }
+      };
+
+      btn.addEventListener('pointerdown', event => {
+        event.stopPropagation();
+      });
+      btn.addEventListener('touchstart', event => {
+        event.stopPropagation();
+      }, { passive: true });
+      btn.addEventListener('pointerup', handleRitualQuickAdd);
+      btn.addEventListener('click', handleRitualQuickAdd);
+      btn.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          handleRitualQuickAdd(event);
+        }
+      });
+    };
+
+    sectionEl.querySelectorAll('[data-ritual-add]').forEach(bindRitualQuickAdd);
+
     // Ritual slider — drag + arrow
-    const track = document.getElementById('knrRitualTrack');
+    const track = document.getElementById('knrRitualTrack-{{ section.id }}');
     if (track) {
       let isDragging = false, startX = 0, scrollStart = 0;
 
       track.addEventListener('mousedown', e => {
+        if (e.target.closest('.knr-pm__ritual-qadd')) return;
         isDragging = true;
         startX = e.pageX;
         scrollStart = track.scrollLeft;
@@ -1394,7 +1765,27 @@
         track.scrollLeft = scrollStart - (e.pageX - startX);
       });
 
-      document.getElementById('knrRitualNext')?.addEventListener('click', () => {
+      track.addEventListener('touchstart', e => {
+        if (e.target.closest('.knr-pm__ritual-qadd')) return;
+        const touch = e.touches[0];
+        if (!touch) return;
+        isDragging = true;
+        startX = touch.pageX;
+        scrollStart = track.scrollLeft;
+      }, { passive: true });
+
+      track.addEventListener('touchmove', e => {
+        if (!isDragging) return;
+        const touch = e.touches[0];
+        if (!touch) return;
+        track.scrollLeft = scrollStart - (touch.pageX - startX);
+      }, { passive: true });
+
+      track.addEventListener('touchend', () => {
+        isDragging = false;
+      }, { passive: true });
+
+      document.getElementById('knrRitualNext-{{ section.id }}')?.addEventListener('click', () => {
         const card = track.querySelector('.knr-pm__ritual-card');
         if (card) track.scrollBy({ left: card.offsetWidth + 10, behavior: 'smooth' });
       });
@@ -1425,8 +1816,8 @@
 
     // Lightbox
     const lb      = document.getElementById('knrPmLb');
-    const lbImg   = document.getElementById('knrPmLbImg');
-    const lbClose = document.getElementById('knrPmLbClose');
+    const lbImg   = document.getElementById('knrPmLbImg-{{ section.id }}');
+    const lbClose = document.getElementById('knrPmLbClose-{{ section.id }}');
 
     const openLb = src => {
       if (!lb || !lbImg || !src) return;
@@ -1558,9 +1949,9 @@
     })();
 
     // Dynamic background — sample dominant color from hero image
-    {%- if section.settings.dynamic_bg -%}
     (() => {
-      const opacity = {{ section.settings.dynamic_bg_opacity | divided_by: 100.0 }};
+      if (sectionEl.dataset.dynamicBg !== 'true') return;
+      const opacity = Number(sectionEl.dataset.dynamicBgOpacity || '0');
       const hero = document.getElementById('knrPmHero');
       const section = hero?.closest('.knr-pm');
       if (!hero || !section) return;
@@ -1587,7 +1978,6 @@
       if (hero.complete && hero.naturalWidth) apply();
       else hero.addEventListener('load', apply);
     })();
-    {%- endif -%}
   })();
 </script>
 
