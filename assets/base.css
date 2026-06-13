@@ -3598,10 +3598,10 @@ details-disclosure > details {
 }
 
 .section-header .header-wrapper--maison {
-    background: transparent;
+    background: transparent !important;
 }
 .knr-pm {
-    margin-top: -90px;
+    margin-top: -90px !important;
 }
 
 
