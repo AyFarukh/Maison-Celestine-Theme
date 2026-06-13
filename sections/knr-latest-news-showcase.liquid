@@ -10,12 +10,12 @@
     padding: {{ section.settings.padding_top }}px {{ section.settings.side_padding }}px {{ section.settings.padding_bottom }}px;
     overflow: hidden;
     width: 100%;
-    max-width: {{ section.settings.section_max_width }}px;
+    {% comment %} max-width: {{ section.settings.section_max_width }}px; {% endcomment %}
     margin: 0 auto;
   }
 
   #shopify-section-{{ section.id }} .knr-news-showcase__inner {
-    max-width: {{ section.settings.section_max_width }}px;
+    {% comment %} max-width: {{ section.settings.section_max_width }}px; {% endcomment %}
     margin: 0 auto;
   }
 
