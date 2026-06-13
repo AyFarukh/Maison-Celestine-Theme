@@ -3649,7 +3649,10 @@ details-disclosure > details {
     left: 2.2rem;
     line-height: calc(1 + .1 / var(--font-body-scale));
 }
-
+.header__icon, .header__icon--cart .icon {
+    width: 3rem;
+    padding: 0;
+}
 }
 .knr-pm__media-item[data-tag=“mobile-image”] {
     display: none;
