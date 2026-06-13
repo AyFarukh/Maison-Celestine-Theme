@@ -3652,7 +3652,7 @@ details-disclosure > details {
 
 .header__icon:not(.header__icon--summary), .header__icon span {
 
-    justify-content: flex-start !important;
+   
 }
 
 }
