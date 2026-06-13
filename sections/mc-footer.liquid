@@ -296,11 +296,16 @@
     gap: 0;
   }
 
-  /* Hide desktop heading, show accordion btn */
+  .mc-footer__logo-bar {
+  
+  margin-top: 20px;
+  
+}
+ 
   .mc-footer__col--menu .mc-footer__col-heading-desktop { display: none; }
   .mc-footer__accordion-btn { display: flex; }
 
-  /* Borders for accordion rows */
+  
   .mc-footer__col--menu {
     border-top: 1px solid {{ section.settings.accordion_border_color }};
   }
@@ -308,7 +313,7 @@
     border-bottom: 1px solid {{ section.settings.accordion_border_color }};
   }
 
-  /* Collapsed by default */
+ 
   .mc-footer__menu-content {
     max-height: 0;
     overflow: hidden;
