@@ -949,12 +949,13 @@
     aria-label="{{ product.title | escape }} media"
   >
     {%- for media in product.media limit: 8 -%}
+       {%  unless media.alt == "desktop-image" %}
       <div class="knr-pm__mobile-slide" data-mobile-slide>
         {%- if media.media_type == 'video' or media.media_type == 'external_video' -%}
           {{- media | video_tag: autoplay: false, muted: true, loop: true, playsinline: true, image_size: '900x' -}}
         {%- else -%}
-          {{media.alt }}
-          {%  unless media.alt == "desktop-image" %}
+          
+         
           <img
             src="{{ media | image_url: width: 900 }}"
             alt="{{ media.alt | default: product.title | escape }}"
@@ -962,9 +963,10 @@
             height="900"
             loading="{{ forloop.first | replace: 'true', 'eager' | replace: 'false', 'lazy' }}"
           >
-          {% endunless %}
+          
         {%- endif -%}
       </div>
+      {% endunless %}
     {%- endfor -%}
   </div>
 
