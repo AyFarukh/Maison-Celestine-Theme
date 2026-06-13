@@ -3624,5 +3624,10 @@ details-disclosure > details {
  
     min-height: auto;
 }
+ .header__icon, .header__icon--cart .icon {
+    height: 4.4rem;
+    width: auto;
+    padding: 0;
+}
 
 }
