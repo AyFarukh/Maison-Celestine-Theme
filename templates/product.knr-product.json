@@ -285,7 +285,6 @@
         "review_xAgKRy",
         "review_pXnmBp"
       ],
-      "disabled": true,
       "settings": {
         "show_title": false,
         "title": "Avis clients",
@@ -671,8 +670,8 @@
     "knr_editorial",
     "knr_how_to",
     "knr_before_after",
-    "17813848360b14badc",
     "knr_reviews",
+    "17813848360b14badc",
     "knr_faq",
     "knr_latest_news_showcase",
     "knr_brand_banner",
