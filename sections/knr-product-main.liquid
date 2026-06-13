@@ -1026,6 +1026,7 @@
     {%- if product.media.size > 1 -%}
       <div class="knr-pm__sub-grid">
         {%- for media in product.media offset: 1 -%}
+          {% unless media.alt == "mobile-image" %}
           <div class="knr-pm__media-item" data-tag="{{media.alt }}" data-lb="{{ media | image_url: width: 2000 }}">
             {%- if media.media_type == 'video' or media.media_type == 'external_video' -%}
               {{- media | video_tag: autoplay: false, muted: true, loop: true, playsinline: true, image_size: '800x' -}}
@@ -1047,6 +1048,7 @@
               <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             </span>
           </div>
+        {% endunless %}
         {%- endfor -%}
       </div>
     {%- endif -%}
