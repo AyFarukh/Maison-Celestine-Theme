@@ -3609,9 +3609,10 @@ details-disclosure > details {
   header-drawer{
     justify-self: end !important;
   }
-  .section-header .header-wrapper--maison .header__icon .svg-wrapper, .section-header .header-wrapper--maison .header__icon .icon {
+  .section-header .header-wrapper--maison .header__icon .svg-wrapper, .section-header .header-wrapper--maison .header__icon .icon,.location-icon-custom {
     width: 1.6rem;
     height: 1.6rem;
   }
+  
 
 }
