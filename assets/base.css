@@ -3626,7 +3626,7 @@ details-disclosure > details {
 }
  .header__icon, .header__icon--cart .icon {
     height: 4.4rem;
-    width: auto;
+    width: 4rem;
     padding: 0;
 }
 .section-header .header-wrapper--maison .header__heading-link .h2 {
