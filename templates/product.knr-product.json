@@ -106,6 +106,7 @@
       "type": "knr-editorial",
       "settings": {
         "bg_image": "shopify://shop_images/ba9711f8e3188ac9a1a699bed15347ddc4f5dabe_1.png",
+        "mobile_bg_image": "shopify://shop_images/a3ad0e21-3aa1-4e14-8817-825056fb5a92.png",
         "note_text": "Notre engagement pour une beauté régénérée",
         "body_text": "Fusionnant l'huile de rosier muscat, le rétinol végétal et l'extrait de cactus, notre sérum pénètre en profondeur pour stimuler le renouvellement cellulaire, atténuer les rides et redonner à la peau son éclat et sa fermeté naturels.",
         "author": "Sophie M.",
@@ -137,6 +138,9 @@
         "image_opacity": 70,
         "overlay_opacity": 0,
         "image_position": "center center",
+        "mobile_image_opacity": 70,
+        "mobile_overlay_opacity": 15,
+        "mobile_image_position": "62% center",
         "card_width": 620,
         "card_padding": 10,
         "card_image_width": 100,
@@ -530,7 +534,6 @@
     },
     "main_product_custom_3HjkmM": {
       "type": "main-product-custom",
-      "disabled": true,
       "blocks": {
         "breadcrumb_qgBPMV": {
           "type": "breadcrumb",
