@@ -3619,5 +3619,10 @@ details-disclosure > details {
     text-decoration: none;
     word-break: break-word;
 }
+.section-header .header-wrapper--maison .header {
+    padding-left: 0px;
+ 
+    min-height: auto;
+}
 
 }
