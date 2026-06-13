@@ -3653,6 +3653,10 @@ details-disclosure > details {
     width: 3rem !important;
     padding: 0;
 }
+.header__icon:not(.header__icon--summary), .header__icon span {
+
+    justify-content: flex-start !important;
+}
 }
 .knr-pm__media-item[data-tag=“mobile-image”] {
     display: none;
