@@ -1021,7 +1021,7 @@
     {%- if product.media.size > 1 -%}
       <div class="knr-pm__sub-grid">
         {%- for media in product.media offset: 1 -%}
-          <div class="knr-pm__media-item" data-tag="{{media.tag }}" data-lb="{{ media | image_url: width: 2000 }}">
+          <div class="knr-pm__media-item" data-tag="{{media.alt }}" data-lb="{{ media | image_url: width: 2000 }}">
             {%- if media.media_type == 'video' or media.media_type == 'external_video' -%}
               {{- media | video_tag: autoplay: false, muted: true, loop: true, playsinline: true, image_size: '800x' -}}
             {%- else -%}
