@@ -1,0 +1,515 @@
+<style>
+  .knr-ba {
+    background: var(--knr-sand-dark);
+    padding: 80px 0 80px;
+    font-family: var(--knr-font);
+    overflow: hidden;
+    width: 100%;
+    max-width: {{ section.settings.section_max_width }}px;
+    margin: 0 auto;
+  }
+
+  .knr-ba__hd {
+    text-align: center;
+    padding: 0 24px;
+    margin-bottom: 44px;
+  }
+
+.knr-ba__title {
+    /* font-size: var(--knr-text-28); */
+    /* font-weight: 300; */
+    /* letter-spacing: .06em; */
+    color: var(--knr-ink);
+    margin: 0 0 16px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 40px;
+    line-height: 48px;
+    letter-spacing: -0.04em;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.knr-ba__subtitle {
+    /* font-size: var(--knr-text-13); */
+    color: var(--knr-ink-60);
+    max-width: 440px;
+    margin: 0 auto;
+    /* line-height: 1.7; */
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 14px;
+    line-height: 22px;
+    letter-spacing: -0.02em;
+    text-align: center;
+    vertical-align: middle;
+}
+
+  /* slider */
+  .knr-ba__slider { position: relative; }
+
+  .knr-ba__track {
+    display: flex;
+    transition: transform .42s ease;
+  }
+
+  .knr-ba__slide {
+    flex: 0 0 100%;
+    padding: 0 80px;
+  }
+
+  .knr-ba__compare {
+    --position: 50%;
+    position: relative;
+    aspect-ratio: 2/1;
+    overflow: hidden;
+    background: var(--knr-sand);
+    cursor: ew-resize;
+    user-select: none;
+  }
+
+  .knr-ba__image {
+    position: absolute;
+    inset: 0;
+  }
+
+  .knr-ba__image--before {
+    clip-path: inset(0 calc(100% - var(--position)) 0 0);
+    z-index: 2;
+  }
+
+  .knr-ba__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .knr-ba__fallback {
+    width: 100%;
+    height: 100%;
+    background:
+      linear-gradient(135deg, rgba(250,249,247,.72), rgba(210,199,184,.74)),
+      var(--knr-sand);
+  }
+
+  .knr-ba__divider {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--position);
+    z-index: 4;
+    width: 1px;
+    background: rgba(250,249,247,.72);
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .knr-ba__handle {
+    position: absolute;
+    top: 50%;
+    left: var(--position);
+    z-index: 5;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(250,249,247,.86);
+    color: var(--knr-ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 8px 24px rgba(28,28,26,.16);
+    pointer-events: none;
+  }
+
+  .knr-ba__handle svg {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    fill: none;
+  }
+
+  .knr-ba__range {
+    position: absolute;
+    inset: 0;
+    z-index: 6;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: ew-resize;
+  }
+
+  .knr-ba__range:focus-visible + .knr-ba__divider + .knr-ba__handle {
+    outline: 2px solid var(--knr-ink);
+    outline-offset: 4px;
+  }
+
+  .knr-ba__label {
+    position: absolute;
+    top: 38px;
+    z-index: 7;
+    font-size: 9px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--knr-ink);
+    pointer-events: none;
+  }
+
+  .knr-ba__label--before { left: 42px; }
+  .knr-ba__label--after { right: 42px; }
+
+  /* controls */
+  .knr-ba__controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    margin-top: 28px;
+    padding: 0 24px;
+  }
+
+  .knr-ba__arrow {
+    width: 38px;
+    height: 38px;
+    border: 1px solid var(--knr-border);
+    background: var(--knr-cream);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color .15s, background-color .15s;
+  }
+
+  .knr-ba__arrow:hover {
+    border-color: var(--knr-ink);
+    background: var(--knr-ink);
+    color: var(--knr-cream);
+  }
+
+  .knr-ba__arrow svg {
+    width: 13px;
+    height: 13px;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    fill: none;
+  }
+
+  .knr-ba__dots {
+    display: flex;
+    gap: 7px;
+  }
+
+  .knr-ba__dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--knr-border);
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: background-color .2s, transform .2s;
+  }
+
+  .knr-ba__dot.active {
+    background: var(--knr-ink);
+    transform: scale(1.3);
+  }
+
+  /* pull quote */
+  .knr-ba__quote {
+    max-width: 680px;
+    margin: 52px auto 0;
+    padding: 0 24px;
+    text-align: center;
+  }
+
+  .knr-ba__quote-ruler {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 22px;
+    font-size: 9px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--knr-ink-60);
+  }
+
+  .knr-ba__quote-ruler::before,
+  .knr-ba__quote-ruler::after {
+    content: '';
+    width: 22px;
+    height: 1px;
+    background: var(--knr-border);
+  }
+
+  .knr-ba__quote-text {
+    font-size: var(--knr-text-18);
+    font-weight: 300;
+    font-style: italic;
+    color: var(--knr-ink);
+    line-height: 1.72;
+    margin: 0 0 18px;
+    transition: opacity .2s;
+  }
+
+  .knr-ba__quote-author {
+    font-size: 10px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--knr-ink-60);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    transition: opacity .2s;
+  }
+
+  .knr-ba__quote-author::before,
+  .knr-ba__quote-author::after {
+    content: '';
+    width: 18px;
+    height: 1px;
+    background: var(--knr-border);
+  }
+
+  .knr-ba__quote-nav {
+    display: flex;
+    justify-content: center;
+    gap: 7px;
+    margin-top: 20px;
+  }
+
+  .knr-ba__quote-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--knr-border);
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: background-color .2s;
+  }
+
+  .knr-ba__quote-dot.active { background: var(--knr-ink); }
+
+  @media (max-width: 860px) {
+    .knr-ba { padding: 52px 0 44px; }
+
+    .knr-ba__slide {
+      padding: 0 20px;
+    }
+
+    .knr-ba__compare { aspect-ratio: 4/5; }
+    .knr-ba__handle {
+      width: 42px;
+      height: 42px;
+    }
+    .knr-ba__label {
+      top: 22px;
+      font-size: 8px;
+    }
+    .knr-ba__label--before { left: 22px; }
+    .knr-ba__label--after { right: 22px; }
+
+    .knr-ba__quote-text { font-size: var(--knr-text-15); }
+  }
+
+    .knr-ba__title {
+        font-size: 32px;
+    }
+</style>
+
+{%- assign ba_blocks = section.blocks | where: 'type', 'pair' -%}
+{%- assign quote_blocks = section.blocks | where: 'type', 'quote' -%}
+
+<section class="knr-ba page-width">
+
+  <div class="knr-ba__hd">
+    <h2 class="knr-ba__title">{{ section.settings.title }}</h2>
+    {%- if section.settings.subtitle != blank -%}
+      <p class="knr-ba__subtitle">{{ section.settings.subtitle }}</p>
+    {%- endif -%}
+  </div>
+
+  {%- if ba_blocks.size > 0 -%}
+    <div class="knr-ba__slider">
+      <div class="knr-ba__track">
+        {%- for block in ba_blocks -%}
+          <div class="knr-ba__slide" {{ block.shopify_attributes }}>
+            <div class="knr-ba__compare" style="--position: 50%;">
+              <div class="knr-ba__image knr-ba__image--after">
+                {%- if block.settings.after_img != blank -%}
+                  <img src="{{ block.settings.after_img | image_url: width: 1800 }}" alt="{{ section.settings.after_lbl | default: 'Après' }}" loading="lazy" width="1400" height="700">
+                {%- else -%}
+                  <div class="knr-ba__fallback" aria-hidden="true"></div>
+                {%- endif -%}
+              </div>
+              <div class="knr-ba__image knr-ba__image--before">
+                {%- if block.settings.before_img != blank -%}
+                  <img src="{{ block.settings.before_img | image_url: width: 1800 }}" alt="{{ section.settings.before_lbl | default: 'Avant' }}" loading="lazy" width="1400" height="700">
+                {%- else -%}
+                  <div class="knr-ba__fallback" aria-hidden="true"></div>
+                {%- endif -%}
+              </div>
+              <span class="knr-ba__label knr-ba__label--before">{{ section.settings.before_lbl | default: 'Avant' }}</span>
+              <span class="knr-ba__label knr-ba__label--after">{{ section.settings.after_lbl | default: 'Après' }}</span>
+              <input
+                class="knr-ba__range"
+                type="range"
+                min="0"
+                max="100"
+                value="50"
+                aria-label="{{ section.settings.before_lbl | default: 'Avant' }} / {{ section.settings.after_lbl | default: 'Après' }}"
+              >
+              <span class="knr-ba__divider" aria-hidden="true"></span>
+              <span class="knr-ba__handle" aria-hidden="true">
+                <svg viewBox="0 0 18 18">
+                  <path d="M6.5 4.5 3 9l3.5 4.5"/>
+                  <path d="M11.5 4.5 15 9l-3.5 4.5"/>
+                </svg>
+              </span>
+            </div>
+          </div>
+        {%- endfor -%}
+      </div>
+
+      {%- if ba_blocks.size > 1 -%}
+        <div class="knr-ba__controls">
+          <button class="knr-ba__arrow knr-ba__arrow--prev" aria-label="Précédent">
+            <svg viewBox="0 0 13 13"><polyline points="8.5 2 3.5 6.5 8.5 11"/></svg>
+          </button>
+          <div class="knr-ba__dots">
+            {%- for block in ba_blocks -%}
+              <button class="knr-ba__dot{% if forloop.first %} active{% endif %}" data-i="{{ forloop.index0 }}" aria-label="Slide {{ forloop.index }}"></button>
+            {%- endfor -%}
+          </div>
+          <button class="knr-ba__arrow knr-ba__arrow--next" aria-label="Suivant">
+            <svg viewBox="0 0 13 13"><polyline points="4.5 2 9.5 6.5 4.5 11"/></svg>
+          </button>
+        </div>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  {%- if quote_blocks.size > 0 -%}
+    {%- assign first_q = quote_blocks.first -%}
+    <div class="knr-ba__quote">
+      <p class="knr-ba__quote-ruler">{{ section.settings.quote_label | default: 'Elles témoignent' }}</p>
+      <blockquote class="knr-ba__quote-text">&ldquo;{{ first_q.settings.text }}&rdquo;</blockquote>
+      <p class="knr-ba__quote-author">{{ first_q.settings.author }}</p>
+
+      {%- if quote_blocks.size > 1 -%}
+        <div class="knr-ba__quote-nav">
+          {%- for block in quote_blocks -%}
+            <button
+              class="knr-ba__quote-dot{% if forloop.first %} active{% endif %}"
+              data-q="{{ block.settings.text | escape }}"
+              data-a="{{ block.settings.author | escape }}"
+              aria-label="Citation {{ forloop.index }}"
+            ></button>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+</section>
+
+<script>
+  (() => {
+    const section = document.currentScript.previousElementSibling;
+    if (!section || !section.classList.contains('knr-ba')) return;
+
+    // before/after slider
+    const track = section.querySelector('.knr-ba__track');
+    const dots  = [...section.querySelectorAll('.knr-ba__dot')];
+    let cur = 0, total = dots.length;
+
+    const goTo = n => {
+      cur = (n + total) % total;
+      if (track) track.style.transform = `translateX(-${cur * 100}%)`;
+      dots.forEach((d, i) => d.classList.toggle('active', i === cur));
+    };
+
+    section.querySelector('.knr-ba__arrow--prev')?.addEventListener('click', () => goTo(cur - 1));
+    section.querySelector('.knr-ba__arrow--next')?.addEventListener('click', () => goTo(cur + 1));
+    dots.forEach(d => d.addEventListener('click', () => goTo(+d.dataset.i)));
+
+    section.querySelectorAll('.knr-ba__compare').forEach(compare => {
+      const range = compare.querySelector('.knr-ba__range');
+      if (!range) return;
+
+      const update = () => {
+        compare.style.setProperty('--position', `${range.value}%`);
+      };
+
+      range.addEventListener('input', update);
+      update();
+    });
+
+    // quote switcher
+    const qText   = section.querySelector('.knr-ba__quote-text');
+    const qAuthor = section.querySelector('.knr-ba__quote-author');
+
+    section.querySelectorAll('.knr-ba__quote-dot').forEach(btn => {
+      btn.addEventListener('click', () => {
+        section.querySelectorAll('.knr-ba__quote-dot').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        if (!qText || !qAuthor) return;
+        qText.style.opacity = qAuthor.style.opacity = '0';
+        setTimeout(() => {
+          qText.innerHTML = `&ldquo;${btn.dataset.q}&rdquo;`;
+          qAuthor.textContent = btn.dataset.a;
+          qText.style.opacity = qAuthor.style.opacity = '1';
+        }, 200);
+      });
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "KNR Before / After",
+  "settings": [
+    { "type": "text",     "id": "title",       "label": "Title",       "default": "Ce que disent nos clientes" },
+    { "type": "textarea", "id": "subtitle",     "label": "Subtitle",    "default": "Des résultats visibles dès 4 semaines d'utilisation régulière." },
+    { "type": "range",    "id": "section_max_width",    "label": "Section max width", "min": 960, "max": 1680, "step": 20, "default": 1440 },
+    { "type": "text",     "id": "before_lbl",   "label": "Before label","default": "Avant" },
+    { "type": "text",     "id": "after_lbl",    "label": "After label", "default": "Après" },
+    { "type": "text",     "id": "quote_label",  "label": "Quote label", "default": "Elles témoignent" }
+  ],
+  "blocks": [
+    {
+      "type": "pair",
+      "name": "Before / After pair",
+      "settings": [
+        { "type": "image_picker", "id": "before_img", "label": "Before image" },
+        { "type": "image_picker", "id": "after_img",  "label": "After image" }
+      ]
+    },
+    {
+      "type": "quote",
+      "name": "Client quote",
+      "settings": [
+        { "type": "textarea", "id": "text",   "label": "Quote",  "default": "J'utilise ce sérum depuis trois mois et la différence est saisissante. Mes rides d'expression se sont considérablement atténuées. Je ne peux plus m'en passer." },
+        { "type": "text",     "id": "author", "label": "Author", "default": "Isabelle M. — Cliente vérifiée" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "KNR Before / After",
+      "blocks": [
+        { "type": "pair" },
+        { "type": "quote", "settings": { "text": "J'utilise ce sérum depuis trois mois et la différence est saisissante. Mes rides d'expression se sont considérablement atténuées. Je ne peux plus m'en passer.", "author": "Isabelle M. — Cliente vérifiée" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

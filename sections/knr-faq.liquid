@@ -1,0 +1,205 @@
+<style>
+.knr-faq {
+    padding: 80px 40px;
+    background: var(--knr-sand);
+    font-family: var(--knr-font);
+    width: 100%;
+    max-width: 1680px;
+    margin: 0 auto;
+    background: #fff;
+}
+
+  .knr-faq__inner {
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+.knr-faq__title {
+    /* font-size: var(--knr-text-28); */
+    /* font-weight: 300; */
+    letter-spacing: .06em;
+    color: var(--knr-ink);
+    margin: 0 0 80px;
+    /* text-align: center; */
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 40px;
+    line-height: 48px;
+    letter-spacing: -0.04em;
+    text-align: center;
+    vertical-align: middle;
+}
+  .knr-faq__item {
+    border-top: 1px solid var(--knr-border);
+  }
+
+  .knr-faq__item:last-child { border-bottom: 1px solid var(--knr-border); }
+
+  .knr-faq__q {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 18px 0;
+    background: none;
+    border: none;
+    font-family: var(--knr-font);
+    font-size: var(--knr-text-14);
+    color: var(--knr-ink);
+    letter-spacing: .02em;
+    text-align: left;
+    cursor: pointer;
+    transition: opacity .15s;
+  }
+
+  .knr-faq__q:hover { opacity: .6; }
+
+  .knr-faq__plus {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .knr-faq__plus::before,
+  .knr-faq__plus::after {
+    content: '';
+    position: absolute;
+    background: var(--knr-ink-60);
+    transition: transform .22s ease, opacity .22s ease;
+  }
+
+  .knr-faq__plus::before { width: 12px; height: 1px; top: 50%; left: 2px; transform: translateY(-50%); }
+  .knr-faq__plus::after  { width: 1px; height: 12px; left: 7px; top: 2px; }
+
+  .knr-faq__item.open .knr-faq__plus::after { transform: scaleY(0); opacity: 0; }
+
+  .knr-faq__body {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height .32s ease;
+  }
+
+  .knr-faq__item.open .knr-faq__body { max-height: 500px; }
+
+  .knr-faq__a {
+    padding-bottom: 20px;
+    font-size: var(--knr-text-13);
+    line-height: 1.8;
+    color: var(--knr-ink-60);
+  }
+
+  .knr-faq__a p + p { margin-top: 8px; }
+
+  @media (max-width: 860px) {
+    .knr-faq { padding: 52px 20px; }
+  }
+  button.knr-faq__q {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 32px;
+  letter-spacing: -0.04em; /* -4% */
+  text-align: center;
+  vertical-align: middle;
+}
+div#knrFaqitem_83RiKz {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 14px;
+    line-height: 22px;
+    letter-spacing: -0.02em;
+    vertical-align: middle;
+    color: #000;
+}
+.knr-faq__title {
+
+    letter-spacing: .06em;
+    color: var(--knr-ink);
+    margin: 0 0 40px;
+/
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 32px;
+    line-height: 48px;
+    letter-spacing: -0.04em;
+    text-align: center;
+    vertical-align: middle;
+}
+</style>
+
+<section class="knr-faq">
+  <div class="knr-faq__inner">
+    <h2 class="knr-faq__title">{{ section.settings.title }}</h2>
+
+    {%- for block in section.blocks -%}
+      <div class="knr-faq__item" {{ block.shopify_attributes }}>
+        <button
+          class="knr-faq__q"
+          type="button"
+          aria-expanded="false"
+          aria-controls="knrFaq{{ block.id }}"
+        >
+          {{ block.settings.question }}
+          <span class="knr-faq__plus" aria-hidden="true"></span>
+        </button>
+        <div class="knr-faq__body" id="knrFaq{{ block.id }}" role="region">
+          <div class="knr-faq__a">{{ block.settings.answer }}</div>
+        </div>
+      </div>
+    {%- endfor -%}
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll('.knr-faq__q').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.closest('.knr-faq__item');
+      const open = item.classList.contains('open');
+      document.querySelectorAll('.knr-faq__item.open').forEach(el => {
+        el.classList.remove('open');
+        el.querySelector('.knr-faq__q').setAttribute('aria-expanded', 'false');
+      });
+      if (!open) {
+        item.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "KNR FAQ",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Title", "default": "Questions fréquentes" },
+    { "type": "range", "id": "section_max_width", "label": "Section max width", "min": 960, "max": 1680, "step": 20, "default": 1440 }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Question",
+      "settings": [
+        { "type": "text",     "id": "question", "label": "Question", "default": "Comment utiliser ?" },
+        { "type": "richtext", "id": "answer",   "label": "Answer",   "default": "<p>Appliquer 2 à 3 gouttes sur le visage propre, matin et soir. Masser jusqu'à absorption complète.</p>" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "KNR FAQ",
+      "blocks": [
+        { "type": "item", "settings": { "question": "Comment utiliser ?",     "answer": "<p>Appliquer 2 à 3 gouttes sur visage propre, matin et soir. Masser jusqu'à absorption.</p>" } },
+        { "type": "item", "settings": { "question": "Quand voir les effets ?","answer": "<p>Des résultats sont visibles dès 4 semaines d'utilisation régulière.</p>" } },
+        { "type": "item", "settings": { "question": "Est-il naturel ?",       "answer": "<p>Oui, 97 % d'ingrédients d'origine naturelle. Sans paraben, silicone ni sulfate.</p>" } },
+        { "type": "item", "settings": { "question": "Peut-on l'associer ?",   "answer": "<p>Il se combine parfaitement avec notre crème hydratante. Appliquer le sérum en premier.</p>" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

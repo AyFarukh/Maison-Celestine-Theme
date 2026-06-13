@@ -1,0 +1,6 @@
+[environments.dev]
+store = "maison-celestine-2"
+
+[environments.production]
+store = "maison-celestine-2"
+live = true

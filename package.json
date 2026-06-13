@@ -1,0 +1,17 @@
+{
+  "name": "maison-celestine-2-theme",
+  "private": true,
+  "scripts": {
+    "shopify": "set -a; [ ! -f .env ] || . ./.env; set +a; shopify",
+    "theme:info": "set -a; [ ! -f .env ] || . ./.env; set +a; shopify theme info --environment dev",
+    "theme:list": "set -a; [ ! -f .env ] || . ./.env; set +a; shopify theme list --environment dev",
+    "theme:dev": "set -a; [ ! -f .env ] || . ./.env; set +a; shopify theme dev --environment dev",
+    "theme:pull:dev": "set -a; [ ! -f .env ] || . ./.env; set +a; shopify theme pull --environment dev",
+    "theme:pull:production": "set -a; [ ! -f .env ] || . ./.env; set +a; shopify theme pull --environment production",
+    "theme:check": "set -a; [ ! -f .env ] || . ./.env; set +a; shopify theme check",
+    "theme:package": "set -a; [ ! -f .env ] || . ./.env; set +a; shopify theme package",
+    "theme:push:dev": "set -a; [ ! -f .env ] || . ./.env; set +a; shopify theme push --environment dev",
+    "theme:push:production": "set -a; [ ! -f .env ] || . ./.env; set +a; shopify theme push --environment production --allow-live"
+  },
+  "devDependencies": {}
+}

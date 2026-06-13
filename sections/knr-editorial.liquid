@@ -1,0 +1,496 @@
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign product_form_id = 'knr-editorial-form-' | append: section.id
+-%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    position: relative;
+    z-index: 5;
+  }
+
+  #shopify-section-{{ section.id }} .knr-editorial {
+    --knr-editorial-height: {{ section.settings.desktop_height }}px;
+    --knr-editorial-bg: {{ section.settings.fallback_bg }};
+    --knr-editorial-text: {{ section.settings.text_color }};
+    --knr-editorial-card-bg: {{ section.settings.card_bg }};
+    --knr-editorial-card-text: {{ section.settings.card_text_color }};
+    --knr-editorial-card-border: {{ section.settings.card_border_color }};
+    position: relative;
+    min-height: var(--knr-editorial-height);
+    background: var(--knr-editorial-bg);
+    color: var(--knr-editorial-text);
+    font-family: var(--knr-font);
+    overflow: visible;
+    width: 100%;
+    max-width: {{ section.settings.section_max_width }}px;
+    margin: 0 auto;
+  }
+
+  #shopify-section-{{ section.id }} .knr-editorial__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  #shopify-section-{{ section.id }} .knr-editorial__bg img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    object-position: {{ section.settings.image_position }};
+    opacity: {{ section.settings.image_opacity | divided_by: 100.0 }};
+  }
+
+  #shopify-section-{{ section.id }} .knr-editorial__shade {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: rgba(0, 0, 0, {{ section.settings.overlay_opacity | divided_by: 100.0 }});
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  #shopify-section-{{ section.id }} .knr-editorial__inner {
+    position: relative;
+    z-index: 2;
+    min-height: var(--knr-editorial-height);
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr) minmax(360px, {{ section.settings.text_width }}px);
+    align-items: center;
+    gap: {{ section.settings.column_gap }}px;
+    max-width: {{ section.settings.section_max_width }}px;
+    margin: 0 auto;
+    padding: {{ section.settings.padding_top }}px {{ section.settings.side_padding }}px {{ section.settings.padding_bottom }}px;
+    margin-top:80px;
+  }
+
+  #shopify-section-{{ section.id }} .knr-editorial__note {
+    align-self: center;
+    max-width: {{ section.settings.note_width }}px;
+    color: rgba(250, 249, 247, .86);
+    font-size: {{ section.settings.note_size }}px;
+    line-height: 1.5;
+    margin-top: {{ section.settings.note_offset | minus: 180 }}px;
+  }
+
+  #shopify-section-{{ section.id }} .knr-editorial__note p {
+    margin: 0;
+  }
+
+  #shopify-section-{{ section.id }} .knr-editorial__note::after {
+    content: '';
+    display: block;
+    width: 20px;
+    height: 1px;
+    margin-top: 12px;
+    background: currentColor;
+    opacity: .72;
+  }
+
+  #shopify-section-{{ section.id }} .knr-editorial__content {
+    align-self: center;
+  }
+
+  #shopify-section-{{ section.id }} .knr-editorial__text {
+    color: var(--knr-editorial-text);
+    font-size: {{ section.settings.body_size }}px;
+  
+    margin: 0;
+        margin: 0;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-style: normal;
+  
+    line-height: 40px;
+    letter-spacing: -0.04em;
+    vertical-align: middle;
+  }
+
+  #shopify-section-{{ section.id }} .knr-editorial__author {
+    color: rgba(250, 249, 247, .86);
+    font-size: {{ section.settings.author_size }}px;
+    line-height: 1.4;
+    margin: {{ section.settings.author_gap }}px 0 0;
+  }
+
+  #shopify-section-{{ section.id }} .knr-editorial__product-card {
+    position: absolute;
+    right: max({{ section.settings.side_padding }}px, calc((100vw - {{ section.settings.section_max_width }}px) / 2 + {{ section.settings.side_padding }}px));
+    bottom: 0;
+    z-index: 20;
+    transform: translateY(50%);
+    width: min({{ section.settings.card_width }}px, calc(100vw - 48px));
+    display: grid;
+    grid-template-columns: {{ section.settings.card_image_width }}px minmax(0, 1fr) {{ section.settings.button_width }}px;
+    gap: 18px;
+    align-items: stretch;
+    background: var(--knr-editorial-card-bg);
+    color: var(--knr-editorial-card-text);
+    border: 1px solid var(--knr-editorial-card-border);
+    padding: {{ section.settings.card_padding }}px;
+    box-shadow: 0 14px 40px rgba(0, 0, 0, .08);
+  }
+
+  #shopify-section-{{ section.id }} .knr-editorial__product-image {
+    height: 100%;
+    min-height: 96px;
+    background: #f2eee7;
+    overflow: hidden;
+  }
+
+  #shopify-section-{{ section.id }} .knr-editorial__product-image img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+  }
+
+  #shopify-section-{{ section.id }} .knr-editorial__product-info {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  #shopify-section-{{ section.id }} .knr-editorial__product-name {
+    color: var(--knr-editorial-card-text);
+    font-size: {{ section.settings.product_title_size }}px;
+    font-weight: 400;
+    line-height: 1.25;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    margin: 0 0 16px;
+  }
+
+  #shopify-section-{{ section.id }} .knr-editorial__variant-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 16px;
+    color: var(--knr-editorial-card-text);
+    font-size: {{ section.settings.option_size }}px;
+    line-height: 1.2;
+  }
+
+  #shopify-section-{{ section.id }} .knr-editorial__variant-options span:first-child {
+    border-bottom: 1px solid currentColor;
+  }
+
+  #shopify-section-{{ section.id }} .knr-editorial__product-price {
+    color: var(--knr-editorial-card-text);
+    font-size: {{ section.settings.price_size }}px;
+    line-height: 1.2;
+    margin: 0;
+  }
+
+  #shopify-section-{{ section.id }} .knr-editorial__product-form {
+    display: flex;
+    align-items: center;
+  }
+
+  #shopify-section-{{ section.id }} .knr-editorial__atc {
+    width: 100%;
+    height: 100%;
+    min-height: 60px;
+    border: 0;
+    background: {{ section.settings.button_bg }};
+    color: {{ section.settings.button_text_color }};
+    font-family: var(--knr-font);
+    font-size: {{ section.settings.button_text_size }}px;
+    line-height: 1.2;
+    padding: 14px 18px;
+    transition: opacity .18s ease;
+  }
+
+  #shopify-section-{{ section.id }} .knr-editorial__atc:hover {
+    opacity: .82;
+  }
+
+  #shopify-section-{{ section.id }} .knr-editorial__atc[disabled] {
+    cursor: not-allowed;
+    {% comment %} opacity: .45;
+    opacity: .45; */ {% endcomment %}
+    background: #000;
+  }
+
+  #shopify-section-{{ section.id }} .knr-editorial__fallback {
+    width: 100%;
+    height: 100%;
+    background:
+      radial-gradient(circle at 42% 38%, rgba(250, 249, 247, .28), transparent 28%),
+      linear-gradient(135deg, rgba(250, 249, 247, .18), rgba(28, 28, 26, .24)),
+      var(--knr-editorial-bg);
+  }
+
+  @media (max-width: 980px) {
+    #shopify-section-{{ section.id }} .knr-editorial {
+      min-height: max({{ section.settings.mobile_height }}px, 100svh);
+    }
+
+    #shopify-section-{{ section.id }} .knr-editorial__inner {
+      min-height: max({{ section.settings.mobile_height }}px, 100svh);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-start;
+      gap: 0;
+      padding: {{ section.settings.mobile_padding_top }}px {{ section.settings.mobile_side_padding }}px {{ section.settings.mobile_padding_bottom }}px;
+      margin-top: 0;
+    }
+
+    #shopify-section-{{ section.id }} .knr-editorial__note {
+      max-width: min(78vw, 320px);
+      margin-top: 0;
+      font-size: {{ section.settings.mobile_note_size }}px;
+      line-height: 1.45;
+      color: rgba(250, 249, 247, .94);
+      margin-bottom: auto;
+    }
+
+    #shopify-section-{{ section.id }} .knr-editorial__content {
+      max-width: 100%;
+      width: 100%;
+    }
+
+    #shopify-section-{{ section.id }} .knr-editorial__text {
+      max-width: min(92vw, 520px);
+      font-size: {{ section.settings.mobile_body_size }}px;
+      line-height: 1.08;
+      letter-spacing: -0.045em;
+      font-weight: 400;
+    }
+
+    #shopify-section-{{ section.id }} .knr-editorial__author {
+      margin-top: 22px;
+      font-size: max({{ section.settings.author_size }}px, 12px);
+      color: rgba(250, 249, 247, .94);
+    }
+
+    #shopify-section-{{ section.id }} .knr-editorial__product-card {
+      display: none;
+    }
+  }
+
+  @media (max-width: 640px) {
+    #shopify-section-{{ section.id }} .knr-editorial__bg img {
+      object-position: 62% center;
+    }
+
+    #shopify-section-{{ section.id }} .knr-editorial__shade {
+      background:
+        linear-gradient(180deg, rgba(0, 0, 0, .04) 0%, rgba(0, 0, 0, .06) 48%, rgba(0, 0, 0, .16) 100%);
+    }
+
+    #shopify-section-{{ section.id }} .knr-editorial__inner {
+      padding:
+        max({{ section.settings.mobile_padding_top }}px, env(safe-area-inset-top, 0px) + 32px)
+        {{ section.settings.mobile_side_padding }}px
+        max({{ section.settings.mobile_padding_bottom }}px, env(safe-area-inset-bottom, 0px) + 56px);
+    }
+
+    #shopify-section-{{ section.id }} .knr-editorial__note {
+      max-width: 240px;
+    }
+
+    #shopify-section-{{ section.id }} .knr-editorial__note::after {
+      width: 24px;
+      margin-top: 14px;
+    }
+
+    #shopify-section-{{ section.id }} .knr-editorial__text {
+      font-size: clamp({{ section.settings.mobile_body_size }}px );
+      line-height: 1.04;
+    }
+  }
+</style>
+
+<section class="knr-editorial" data-knr-editorial>
+  <div class="knr-editorial__bg" aria-hidden="true">
+    {%- if section.settings.bg_image != blank -%}
+      <img
+        src="{{ section.settings.bg_image | image_url: width: 2200 }}"
+        alt=""
+        width="2200"
+        height="{{ section.settings.desktop_height }}"
+        loading="lazy"
+      >
+    {%- else -%}
+      <div class="knr-editorial__fallback"></div>
+    {%- endif -%}
+  </div>
+  <div class="knr-editorial__shade" aria-hidden="true"></div>
+
+  <div class="knr-editorial__inner">
+    {%- if section.settings.note_text != blank -%}
+      <div class="knr-editorial__note">
+        <p>{{ section.settings.note_text }}</p>
+      </div>
+    {%- endif -%}
+
+    <div class="knr-editorial__content">
+      {%- if section.settings.body_text != blank -%}
+        <p class="knr-editorial__text">{{ section.settings.body_text }}</p>
+      {%- endif -%}
+      {%- if section.settings.author != blank -%}
+        <p class="knr-editorial__author">{{ section.settings.author }}</p>
+      {%- endif -%}
+    </div>
+  </div>
+
+  {%- if section.settings.show_product_card and product != blank -%}
+    <div class="knr-editorial__product-card">
+      <a class="knr-editorial__product-image" href="{{ product.url }}" tabindex="-1" aria-hidden="true">
+        {%- if product.featured_media != blank -%}
+          <img
+            src="{{ product.featured_media | image_url: width: 260 }}"
+            alt="{{ product.featured_media.alt | default: product.title | escape }}"
+            width="{{ section.settings.card_image_width }}"
+            height="110"
+            loading="lazy"
+          >
+        {%- endif -%}
+      </a>
+
+      <div class="knr-editorial__product-info">
+        <p class="knr-editorial__product-name">{{ product.title }}</p>
+        {%- unless product.has_only_default_variant -%}
+          <div class="knr-editorial__variant-options">
+            {%- assign first_option = product.options_with_values.first -%}
+            {%- for option_value in first_option.values limit: 2 -%}
+              <span>{{ option_value }}</span>
+            {%- endfor -%}
+          </div>
+        {%- endunless -%}
+        <p class="knr-editorial__product-price">{{ current_variant.price | money }}</p>
+      </div>
+
+      <form class="knr-editorial__product-form" id="{{ product_form_id }}" action="{{ routes.cart_add_url }}" method="post">
+        <input type="hidden" name="id" value="{{ current_variant.id }}">
+        <input type="hidden" name="quantity" value="1">
+        <button
+          type="submit"
+          name="add"
+          class="knr-editorial__atc"
+          {% unless current_variant.available %}disabled{% endunless %}
+        >
+          {%- if current_variant.available -%}
+            {{ section.settings.button_label }}
+          {%- else -%}
+            {{ section.settings.sold_out_label }}
+          {%- endif -%}
+        </button>
+      </form>
+    </div>
+  {%- endif -%}
+</section>
+
+<script>
+  (() => {
+    const section = document.currentScript.previousElementSibling;
+    const form = section?.querySelector('.knr-editorial__product-form');
+    const button = section?.querySelector('.knr-editorial__atc');
+    if (!section || !form || !button) return;
+
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+      if (button.disabled) return;
+
+      const label = button.textContent;
+      button.disabled = true;
+      button.textContent = '{{ section.settings.adding_label | escape }}';
+
+      try {
+        const response = await fetch('/cart/add.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: Number(form.querySelector('[name="id"]').value),
+            quantity: Number(form.querySelector('[name="quantity"]').value || 1)
+          })
+        });
+
+        if (!response.ok) throw new Error('Cart add failed');
+
+        const cart = await (await fetch('/cart.js')).json();
+        document.dispatchEvent(new CustomEvent('knr:cart:updated', { detail: cart, bubbles: true }));
+        button.textContent = '{{ section.settings.added_label | escape }}';
+
+        setTimeout(() => {
+          button.disabled = false;
+          button.textContent = label;
+        }, 1500);
+      } catch (error) {
+        button.disabled = false;
+        button.textContent = label;
+      }
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "KNR Editorial",
+  "settings": [
+    { "type": "image_picker", "id": "bg_image", "label": "Background image" },
+    { "type": "text", "id": "note_text", "label": "Left note", "default": "Notre engagement pour une beauté régénérée" },
+    { "type": "textarea", "id": "body_text", "label": "Main text", "default": "Fusionnant l'huile de rosier muscat, le rétinol végétal et l'extrait de cactus, notre sérum pénètre en profondeur pour stimuler le renouvellement cellulaire, atténuer les rides et redonner à la peau son éclat et sa fermeté naturels." },
+    { "type": "text", "id": "author", "label": "Small author text", "default": "Sophie M." },
+    { "type": "checkbox", "id": "show_product_card", "label": "Show floating product card", "default": true },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "Ajouter au panier" },
+    { "type": "text", "id": "sold_out_label", "label": "Sold out label", "default": "Indisponible" },
+    { "type": "text", "id": "adding_label", "label": "Adding label", "default": "Ajout..." },
+    { "type": "text", "id": "added_label", "label": "Added label", "default": "Ajouté" },
+    { "type": "color", "id": "fallback_bg", "label": "Fallback background", "default": "#777162" },
+    { "type": "color", "id": "text_color", "label": "Text color", "default": "#ffffff" },
+    { "type": "color", "id": "card_bg", "label": "Product card background", "default": "#ffffff" },
+    { "type": "color", "id": "card_text_color", "label": "Product card text", "default": "#111111" },
+    { "type": "color", "id": "card_border_color", "label": "Product card border", "default": "#ece7dd" },
+    { "type": "color", "id": "button_bg", "label": "Button background", "default": "#000000" },
+    { "type": "color", "id": "button_text_color", "label": "Button text", "default": "#ffffff" },
+    { "type": "range", "id": "desktop_height", "label": "Desktop height", "min": 520, "max": 920, "step": 20, "default": 760 },
+    { "type": "range", "id": "section_max_width", "label": "Content width", "min": 1100, "max": 1680, "step": 20, "default": 1440 },
+    { "type": "range", "id": "side_padding", "label": "Side padding", "min": 24, "max": 100, "step": 4, "default": 48 },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 40, "max": 160, "step": 4, "default": 80 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 80, "max": 240, "step": 4, "default": 136 },
+    { "type": "range", "id": "column_gap", "label": "Column gap", "min": 40, "max": 240, "step": 10, "default": 140 },
+    { "type": "range", "id": "text_width", "label": "Main text width", "min": 420, "max": 760, "step": 20, "default": 560 },
+    { "type": "range", "id": "note_width", "label": "Left note width", "min": 160, "max": 420, "step": 20, "default": 300 },
+    { "type": "range", "id": "note_offset", "label": "Left note vertical offset", "min": 0, "max": 360, "step": 10, "default": 220 },
+    { "type": "range", "id": "body_size", "label": "Main text size", "min": 28, "max": 54, "step": 1, "default": 34 },
+    { "type": "range", "id": "note_size", "label": "Left note size", "min": 10, "max": 18, "step": 1, "default": 13 },
+    { "type": "range", "id": "author_size", "label": "Author size", "min": 9, "max": 16, "step": 1, "default": 11 },
+    { "type": "range", "id": "author_gap", "label": "Author gap", "min": 16, "max": 48, "step": 4, "default": 24 },
+    { "type": "range", "id": "image_opacity", "label": "Image opacity", "min": 40, "max": 100, "step": 5, "default": 70 },
+    { "type": "range", "id": "overlay_opacity", "label": "Dark overlay", "min": 0, "max": 50, "step": 5, "default": 0 },
+    { "type": "select", "id": "image_position", "label": "Image position", "default": "center center", "options": [
+      { "value": "center center", "label": "Center" },
+      { "value": "center top", "label": "Top" },
+      { "value": "center bottom", "label": "Bottom" },
+      { "value": "left center", "label": "Left" },
+      { "value": "right center", "label": "Right" }
+    ] },
+    { "type": "range", "id": "card_width", "label": "Product card width", "min": 480, "max": 760, "step": 20, "default": 620 },
+    { "type": "range", "id": "card_padding", "label": "Product card padding", "min": 8, "max": 28, "step": 2, "default": 10 },
+    { "type": "range", "id": "card_image_width", "label": "Product image width", "min": 70, "max": 150, "step": 10, "default": 100 },
+    { "type": "range", "id": "button_width", "label": "Button width", "min": 160, "max": 260, "step": 10, "default": 220 },
+    { "type": "range", "id": "product_title_size", "label": "Product title size", "min": 11, "max": 18, "step": 1, "default": 14 },
+    { "type": "range", "id": "option_size", "label": "Variant text size", "min": 10, "max": 16, "step": 1, "default": 13 },
+    { "type": "range", "id": "price_size", "label": "Price size", "min": 12, "max": 20, "step": 1, "default": 15 },
+    { "type": "range", "id": "button_text_size", "label": "Button text size", "min": 11, "max": 16, "step": 1, "default": 13 },
+    { "type": "range", "id": "mobile_height", "label": "Mobile image area height", "min": 520, "max": 820, "step": 20, "default": 620 },
+    { "type": "range", "id": "mobile_side_padding", "label": "Mobile side padding", "min": 18, "max": 40, "step": 2, "default": 24 },
+    { "type": "range", "id": "mobile_padding_top", "label": "Mobile padding top", "min": 48, "max": 140, "step": 4, "default": 72 },
+    { "type": "range", "id": "mobile_padding_bottom", "label": "Mobile padding bottom", "min": 80, "max": 220, "step": 4, "default": 144 },
+    { "type": "range", "id": "mobile_content_gap", "label": "Mobile content gap", "min": 24, "max": 80, "step": 4, "default": 40 },
+    { "type": "range", "id": "mobile_body_size", "label": "Mobile main text size", "min": 24, "max": 38, "step": 1, "default": 30 },
+    { "type": "range", "id": "mobile_note_size", "label": "Mobile note size", "min": 10, "max": 16, "step": 1, "default": 12 }
+  ],
+  "presets": [
+    {
+      "name": "KNR Editorial"
+    }
+  ]
+}
+{% endschema %}

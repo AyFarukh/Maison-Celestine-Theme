@@ -1,0 +1,521 @@
+{%- liquid
+  assign sid = section.id
+-%}
+
+{%- style -%}
+  #ceh-{{ sid }} {
+    --ceh-bg:         {{ section.settings.bg_color }};
+    --ceh-text:       {{ section.settings.text_color }};
+    --ceh-btn-bg:     {{ section.settings.button_color }};
+    --ceh-btn-text:   {{ section.settings.button_text_color }};
+    --ceh-border:     {{ section.settings.input_border_color }};
+    --ceh-img-col:    {{ section.settings.image_col_width }}%;
+    --ceh-img-h:      {{ section.settings.image_height_desktop }}px;
+    --ceh-mob-img-h:  {{ section.settings.image_height_mobile }}px;
+    --ceh-head-size:  {{ section.settings.heading_size }}px;
+    --ceh-mob-head:   {{ section.settings.heading_size_mobile }}px;
+    --ceh-pad-top:    {{ section.settings.section_padding_top }}px;
+    --ceh-pad-bot:    {{ section.settings.section_padding_bottom }}px;
+    --ceh-content-px: {{ section.settings.content_side_padding }}px;
+  }
+{%- endstyle -%}
+
+<section id="ceh-{{ sid }}" class="ceh">
+
+  <!-- page-width container from the theme -->
+  <div class="ceh__wrap">
+    <div class="ceh__grid">
+
+      <!-- ── IMAGE COLUMN ─────────────────────────────────── -->
+      <div class="ceh__img-col">
+        {%- if section.settings.image != blank -%}
+          <img
+            src="{{ section.settings.image | image_url: width: 1400 }}"
+            srcset="
+              {{ section.settings.image | image_url: width: 600 }} 600w,
+              {{ section.settings.image | image_url: width: 900 }} 900w,
+              {{ section.settings.image | image_url: width: 1200 }} 1200w,
+              {{ section.settings.image | image_url: width: 1400 }} 1400w
+            "
+            sizes="(max-width: 767px) 100vw, {{ section.settings.image_col_width }}vw"
+            alt="{{ section.settings.image.alt | escape | default: section.settings.heading | escape }}"
+            loading="lazy"
+            class="ceh__img"
+          >
+        {%- else -%}
+          <div class="ceh__img ceh__img--ph">
+            {{ 'lifestyle-2' | placeholder_svg_tag: 'ceh__ph-svg' }}
+          </div>
+        {%- endif -%}
+      </div>
+
+      <!-- ── CONTENT COLUMN ───────────────────────────────── -->
+      <div class="ceh__content">
+
+        {%- unless section.settings.heading == blank -%}
+          <{{ section.settings.heading_tag }} class="ceh__heading">
+            {{ section.settings.heading }}
+          </{{ section.settings.heading_tag }}>
+        {%- endunless -%}
+
+        <!-- Email form -->
+        {%- assign _form_id = 'ceh-form-' | append: sid -%}
+        {%- form 'contact', id: _form_id, class: 'ceh__form' -%}
+
+          <input type="hidden" name="contact[tags]" value="newsletter">
+
+          {%- if form.posted_successfully? -%}
+            <p class="ceh__success">
+              {{ section.settings.success_msg | default: 'Merci pour votre inscription !' }}
+            </p>
+          {%- else -%}
+
+            <div class="ceh__form-row">
+              <label for="ceh-email-{{ sid }}" class="visually-hidden">
+                {{- section.settings.email_placeholder | default: 'E-mail' -}}
+              </label>
+              <input
+                id="ceh-email-{{ sid }}"
+                type="email"
+                name="contact[email]"
+                class="ceh__input"
+                placeholder="{{ section.settings.email_placeholder | default: 'E-mail' }}"
+                autocomplete="email"
+                required
+              >
+              <button type="submit" class="ceh__btn">
+                {{ section.settings.button_text | default: "S'inscrire" }}
+              </button>
+            </div>
+
+            {%- if form.errors -%}
+              <p class="ceh__error">{{ 'templates.contact.form.error_heading' | t }}</p>
+            {%- endif -%}
+
+          {%- endif -%}
+
+        {%- endform -%}
+
+        {%- unless section.settings.disclaimer == blank -%}
+          <p class="ceh__disclaimer">{{ section.settings.disclaimer }}</p>
+        {%- endunless -%}
+
+      </div><!-- /content -->
+
+    </div><!-- /grid -->
+  </div><!-- /wrap -->
+
+</section>
+
+
+<!-- ════════════════════════════════════════════════════════
+     CSS
+     ════════════════════════════════════════════════════════ -->
+<style>
+
+/* Reset within section */
+#ceh-{{ sid }},
+#ceh-{{ sid }} *,
+#ceh-{{ sid }} *::before,
+#ceh-{{ sid }} *::after { box-sizing: border-box; }
+
+/* ── Section shell ─────────────────────────────────────── */
+#ceh-{{ sid }}.ceh {
+  background: var(--ceh-bg, #ffffff);
+  padding-top:    var(--ceh-pad-top, 60px);
+  padding-bottom: var(--ceh-pad-bot, 60px);
+  overflow: hidden;
+}
+
+/* ── Override page-width padding on the image side ────── */
+#ceh-{{ sid }} .ceh__wrap {
+  /* page-width class already handles max-width + auto margin.
+     We remove the default horizontal padding so the image
+     can sit flush to the container edge on the left. */
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* ── Two-column grid ───────────────────────────────────── */
+#ceh-{{ sid }} .ceh__grid {
+  display: grid;
+  grid-template-columns: var(--ceh-img-col, 52%) 1fr;
+  align-items: center;
+  gap: 0;
+      padding: 0px 40px;
+}
+
+/* ── Image column ──────────────────────────────────────── */
+#ceh-{{ sid }} .ceh__img-col {
+  height: var(--ceh-img-h, 580px);
+  overflow: hidden;
+}
+
+#ceh-{{ sid }} .ceh__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+#ceh-{{ sid }} .ceh__img--ph {
+  background: #f5f0e8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#ceh-{{ sid }} .ceh__ph-svg {
+  width: 60%;
+  height: 60%;
+  opacity: .3;
+}
+
+/* ── Content column ────────────────────────────────────── */
+#ceh-{{ sid }} .ceh__content {
+  padding: 0 var(--ceh-content-px, 72px);
+}
+
+/* ── Heading ───────────────────────────────────────────── */
+#ceh-{{ sid }} .ceh__heading {
+  font-size: var(--ceh-head-size, 40px);
+  font-weight: 400;
+  line-height: 1.06;
+  letter-spacing: -.01em;
+  font-weight: 400;
+  color: var(--ceh-text, #000);
+  margin: 0 0 44px;
+}
+
+/* ── Form layout ───────────────────────────────────────── */
+#ceh-{{ sid }} .ceh__form { margin: 0; }
+
+#ceh-{{ sid }} .ceh__form-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  margin-bottom: 14px;
+}
+
+#ceh-{{ sid }} .ceh__input {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 52px;
+  border: 1px solid var(--ceh-border, #d8d4cf);
+  border-right: none;
+  padding: 0 18px;
+  font-size: 14px;
+  color: var(--ceh-text, #111);
+  background: transparent;
+  outline: none;
+  font-family: inherit;
+  transition: border-color .2s;
+  -webkit-appearance: none;
+}
+
+#ceh-{{ sid }} .ceh__input:focus {
+  border-color: #999;
+}
+
+#ceh-{{ sid }} .ceh__input::placeholder {
+  color: #aaa;
+}
+
+#ceh-{{ sid }} .ceh__btn {
+  flex-shrink: 0;
+  height: 52px;
+  padding: 0 30px;
+  background: var(--ceh-btn-bg, #111111);
+  color: var(--ceh-btn-text, #ffffff);
+  border: none;
+  font-size: 13px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: background .2s;
+}
+
+#ceh-{{ sid }} .ceh__btn:hover {
+  background: color-mix(in srgb, var(--ceh-btn-bg, #111) 80%, transparent);
+}
+
+/* ── Feedback messages ─────────────────────────────────── */
+#ceh-{{ sid }} .ceh__success {
+  font-size: 14px;
+  color: #5a8a5a;
+  padding: 14px 0;
+}
+
+#ceh-{{ sid }} .ceh__error {
+  font-size: 12px;
+  color: #b94040;
+  margin-top: 6px;
+}
+
+/* ── Disclaimer ────────────────────────────────────────── */
+#ceh-{{ sid }} .ceh__disclaimer {
+         margin-top: 14px;
+        font-family: Inter;
+        font-weight: 400;
+        font-size: 10px;
+        line-height: 14px;
+        letter-spacing: -2%;
+        vertical-align: middle;
+        color: #000;
+}
+
+
+/* ════════════════════════════════════════════════════════
+   MOBILE  ≤ 767px
+   ════════════════════════════════════════════════════════ */
+@media screen and (max-width: 767px) {
+
+  /* No section padding on mobile — image goes edge to edge */
+  #ceh-{{ sid }}.ceh {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  /* Stack columns */
+  #ceh-{{ sid }} .ceh__grid {
+    grid-template-columns: 1fr;
+    padding: 0px 24px;
+  }
+
+  /* Image: full width, fixed height */
+  #ceh-{{ sid }} .ceh__img-col {
+    height: var(--ceh-mob-img-h, 380px);
+    width: 100%;
+  }
+
+  /* Content: add vertical padding back */
+  #ceh-{{ sid }} .ceh__content {
+    padding: 40px 0px 40px;
+  }
+
+  /* Scale heading down */
+  #ceh-{{ sid }} .ceh__heading {
+    font-size: var(--ceh-mob-head, 34px);
+    line-height: 1.1;
+    letter-spacing: -.01em;
+    margin-bottom: 36px;
+  }
+
+  /* Stack the form vertically */
+  #ceh-{{ sid }} .ceh__form-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  #ceh-{{ sid }} .ceh__input {
+    border-right: 1px solid var(--ceh-border, #d8d4cf);
+    width: 100%;
+   flex: auto;
+   min-width: 0;
+    height: 50px;
+
+  }
+
+  #ceh-{{ sid }} .ceh__btn {
+    width: 100%;
+    height: 52px;
+    padding: 0;
+  }
+
+  #ceh-{{ sid }} .ceh__disclaimer {
+         margin-top: 14px;
+        font-family: Inter;
+        font-weight: 400;
+        font-size: 10px;
+        line-height: 14px;
+        letter-spacing: -2%;
+        vertical-align: middle;
+        color: #000;
+  }
+}
+</style>
+
+
+{% schema %}
+{
+  "name": "Email Hero",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "range",
+      "id": "image_col_width",
+      "label": "Largeur colonne image (% desktop)",
+      "min": 35,
+      "max": 65,
+      "step": 1,
+      "default": 52
+    },
+    {
+      "type": "range",
+      "id": "image_height_desktop",
+      "label": "Hauteur image desktop (px)",
+      "min": 360,
+      "max": 900,
+      "step": 10,
+      "default": 580
+    },
+    {
+      "type": "range",
+      "id": "image_height_mobile",
+      "label": "Hauteur image mobile (px)",
+      "min": 240,
+      "max": 560,
+      "step": 10,
+      "default": 380
+    },
+    {
+      "type": "header",
+      "content": "Contenu"
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Balise du titre",
+      "options": [
+        { "value": "h1", "label": "H1" },
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Titre",
+      "default": "L'alliance de la science botanique et du luxe naturel pour une peau visiblement rajeunie en 4 semaines."
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Taille titre desktop (px)",
+      "min": 28,
+      "max": 80,
+      "step": 2,
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "heading_size_mobile",
+      "label": "Taille titre mobile (px)",
+      "min": 22,
+      "max": 52,
+      "step": 2,
+      "default": 34
+    },
+    {
+      "type": "range",
+      "id": "content_side_padding",
+      "label": "Padding horizontal contenu (px)",
+      "min": 24,
+      "max": 120,
+      "step": 4,
+      "default": 72
+    },
+    {
+      "type": "header",
+      "content": "Formulaire"
+    },
+    {
+      "type": "text",
+      "id": "email_placeholder",
+      "label": "Placeholder email",
+      "default": "E-mail"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Texte bouton",
+      "default": "S'inscrire"
+    },
+    {
+      "type": "text",
+      "id": "success_msg",
+      "label": "Message de succès",
+      "default": "Merci pour votre inscription !"
+    },
+    {
+      "type": "textarea",
+      "id": "disclaimer",
+      "label": "Texte disclaimer",
+      "default": "Formule brevetée, testée dermatologiquement, 97 % d'ingrédients d'origine naturelle."
+    },
+    {
+      "type": "header",
+      "content": "Espacement section"
+    },
+    {
+      "type": "range",
+      "id": "section_padding_top",
+      "label": "Padding haut desktop (px)",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "section_padding_bottom",
+      "label": "Padding bas desktop (px)",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "Couleurs"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Fond section",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Couleur texte",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "button_color",
+      "label": "Fond bouton",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Texte bouton",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "input_border_color",
+      "label": "Bordure champ email",
+      "default": "#d8d4cf"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Email Hero"
+    }
+  ]
+}
+{% endschema %}

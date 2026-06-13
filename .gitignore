@@ -1,0 +1,9 @@
+.DS_Store
+node_modules/
+.env
+.env.*
+!.env.example
+
+# Shopify CLI / theme build artifacts
+.shopify/
+*.zip

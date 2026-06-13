@@ -1,0 +1,91 @@
+:root {
+  --knr-sand: #f5f3ef;
+  --knr-sand-dark: #ede9e3;
+  --knr-ink: #1c1c1a;
+  --knr-ink-60: rgba(28, 28, 26, 0.6);
+  --knr-ink-30: rgba(28, 28, 26, 0.3);
+  --knr-cream: #faf9f7;
+  --knr-border: #e3dfd9;
+  --knr-gold: #c4a882;
+  --knr-dark-bg: #28271f;
+  --knr-white: #ffffff;
+
+  --knr-font: 'Inter', sans-serif;
+
+  --knr-text-10: 10px;
+  --knr-text-11: 11px;
+  --knr-text-12: 12px;
+  --knr-text-13: 13px;
+  --knr-text-14: 14px;
+  --knr-text-15: 15px;
+  --knr-text-18: 18px;
+  --knr-text-22: 22px;
+  --knr-text-28: 28px;
+  --knr-text-36: 36px;
+  --knr-text-52: 52px;
+}
+
+.knr-page-wrap,
+body.template-product-knr-product #MainContent {
+  font-family: var(--knr-font);
+  color: var(--knr-ink);
+  background: var(--knr-sand);
+}
+
+.knr-page-wrap *,
+.knr-page-wrap *::before,
+.knr-page-wrap *::after,
+body.template-product-knr-product #MainContent *,
+body.template-product-knr-product #MainContent *::before,
+body.template-product-knr-product #MainContent *::after {
+  box-sizing: border-box;
+}
+
+.knr-page-wrap img,
+body.template-product-knr-product #MainContent img {
+  display: block;
+  max-width: 100%;
+}
+
+.knr-page-wrap button,
+body.template-product-knr-product #MainContent button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.knr-page-wrap a,
+body.template-product-knr-product #MainContent a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.knr-page-wrap ul,
+body.template-product-knr-product #MainContent ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.knr-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .knr-page-wrap *,
+  .knr-page-wrap *::before,
+  .knr-page-wrap *::after,
+  body.template-product-knr-product #MainContent *,
+  body.template-product-knr-product #MainContent *::before,
+  body.template-product-knr-product #MainContent *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

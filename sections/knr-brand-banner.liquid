@@ -1,0 +1,165 @@
+<style>
+  #shopify-section-{{ section.id }} .knr-banner-wrap {
+    background: {{ section.settings.section_bg }};
+    padding: {{ section.settings.padding_top }}px {{ section.settings.side_padding }}px {{ section.settings.padding_bottom }}px;
+    font-family: var(--knr-font);
+    width: 100%;
+    max-width: {{ section.settings.section_max_width }}px;
+    margin: 0 auto;
+  }
+
+  #shopify-section-{{ section.id }} .knr-banner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 480px;
+    background: var(--knr-sand-dark);
+    max-width: {{ section.settings.section_max_width }}px;
+    margin: 0 auto;
+  }
+
+  .knr-banner__media {
+    overflow: hidden;
+  }
+
+  .knr-banner__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .knr-banner__content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px 56px;
+  }
+
+  .knr-banner__eyebrow {
+    font-size: 10px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--knr-ink-60);
+    margin-bottom: 18px;
+  }
+
+    .knr-banner__heading {
+        font-size: var(--knr-text-36);
+        font-weight: 300;
+        color: var(--knr-ink);
+        line-height: 1.22;
+        letter-spacing: .02em;
+        margin: 0 0 24px;
+        /* max-width: 563px; */
+        font-family: Inter;
+        font-weight: 400;
+        font-style: Regular;
+        font-size: 40px;
+        leading-trim: NONE;
+        line-height: 48px;
+        letter-spacing: -4%;
+        vertical-align: middle;
+    }
+
+  .knr-banner__btn {
+    display: inline-block;
+    padding: 12px 32px;
+    background: var(--knr-ink);
+    color: var(--knr-cream);
+    font-family: var(--knr-font);
+    font-size: 10px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    border: 1px solid var(--knr-ink);
+    align-self: flex-start;
+    transition: background-color .2s, color .2s;
+    color:#fff;
+  }
+a.knr-banner__btn font {
+    color: #fff;
+}
+  .knr-banner__btn:hover {
+    background: transparent;
+    color: var(--knr-ink);
+  }
+
+  @media (max-width: 860px) {
+    #shopify-section-{{ section.id }} .knr-banner-wrap {
+      padding: {{ section.settings.mobile_padding_top }}px {{ section.settings.mobile_side_padding }}px {{ section.settings.mobile_padding_bottom }}px;
+    }
+
+    .knr-banner {
+      grid-template-columns: 1fr;
+    }
+
+    .knr-banner__media {
+      height: 55vw;
+      min-height: 260px;
+    }
+
+    .knr-banner__content {
+      padding: 40px 24px;
+    }
+
+    .knr-banner__heading { font-size: var(--knr-text-22); }
+  }
+   @media (max-width: 768px) {
+    .knr-banner {
+    display: block !important;
+}
+
+   }
+</style>
+
+<section class="knr-banner-wrap">
+  <div class="knr-banner page-width">
+    <div class="knr-banner__media">
+      {%- if section.settings.image != blank -%}
+        <img
+          src="{{ section.settings.image | image_url: width: 1000 }}"
+          alt="{{ section.settings.heading | escape }}"
+          width="700" height="480"
+          loading="lazy"
+        >
+      {%- endif -%}
+    </div>
+
+    <div class="knr-banner__content">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="knr-banner__eyebrow">{{ section.settings.eyebrow }}</p>
+      {%- endif -%}
+
+      {%- if section.settings.heading != blank -%}
+        <h2 class="knr-banner__heading">{{ section.settings.heading }}</h2>
+      {%- endif -%}
+
+      {%- if section.settings.btn_label != blank -%}
+        <a href="{{ section.settings.btn_url | default: product.url }}" class="knr-banner__btn">
+          {{ section.settings.btn_label }}
+        </a>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "KNR Brand Banner",
+  "settings": [
+    { "type": "image_picker", "id": "image",     "label": "Image" },
+    { "type": "text",         "id": "eyebrow",   "label": "Eyebrow",       "default": "Maison Célestine" },
+    { "type": "textarea",     "id": "heading",   "label": "Heading",       "default": "L'alliance de la science botanique et du luxe naturel pour une peau visiblement rajeunie en 4 semaines." },
+    { "type": "text",         "id": "btn_label", "label": "Button label",  "default": "Découvrir le sérum" },
+    { "type": "url",          "id": "btn_url",   "label": "Button URL" },
+    { "type": "color",        "id": "section_bg", "label": "Section background", "default": "#f5f3ef" },
+    { "type": "range",        "id": "section_max_width", "label": "Section max width", "min": 960, "max": 1680, "step": 20, "default": 1440 },
+    { "type": "range",        "id": "side_padding", "label": "Side padding", "min": 0, "max": 80, "step": 4, "default": 0 },
+    { "type": "range",        "id": "padding_top", "label": "Padding top", "min": 0, "max": 120, "step": 4, "default": 0 },
+    { "type": "range",        "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 120, "step": 4, "default": 0 },
+    { "type": "range",        "id": "mobile_side_padding", "label": "Mobile side padding", "min": 0, "max": 40, "step": 2, "default": 0 },
+    { "type": "range",        "id": "mobile_padding_top", "label": "Mobile padding top", "min": 0, "max": 80, "step": 4, "default": 0 },
+    { "type": "range",        "id": "mobile_padding_bottom", "label": "Mobile padding bottom", "min": 0, "max": 80, "step": 4, "default": 0 }
+  ],
+  "presets": [{ "name": "KNR Brand Banner" }]
+}
+{% endschema %}

@@ -1,0 +1,1831 @@
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign product_form_id = 'knr-pmf-' | append: section.id
+  assign has_variants = false
+  unless product.has_only_default_variant
+    assign has_variants = true
+  endunless
+
+  assign short_desc = product.metafields.custom.short_description.value
+  if short_desc == blank
+    assign short_desc = section.settings.short_desc
+  endif
+
+  assign delivery_msg = product.metafields.custom.delivery_message.value
+  if delivery_msg == blank
+    assign delivery_msg = section.settings.delivery_message
+  endif
+
+  assign ritual_prods = product.metafields.custom.ritual_products.value
+
+  assign desc_tab  = product.metafields.custom.product_description_tab.value
+  assign bene_tab  = product.metafields.custom.benefits.value
+  assign ingr_tab  = product.metafields.custom.ingredients.value
+  assign skin_tab  = product.metafields.custom.skin_types.value
+-%}
+
+<style>
+  /* ─── Root ─── */
+  .knr-pm {
+    display: grid;
+    {% comment %} grid-template-columns: 62% 38%; {% endcomment %}
+    align-items: start;
+ 
+    font-family: var(--knr-font);
+    transition: background-color .7s ease;
+    width: 100%;
+    max-width: {{ section.settings.section_max_width }}px;
+    margin: 0 auto;
+  }
+
+  .knr-pm--info-left .knr-pm__gallery {
+    order: 2;
+  }
+
+  .knr-pm--info-left .knr-pm__info {
+    order: 1;
+    border-left: none;
+    border-right: 1px solid var(--knr-border);
+    padding: 28px 28px 48px 36px;
+    transform: translateX(40px);
+  }
+
+  /* ─── Gallery (left) ─── */
+  .knr-pm__gallery {
+    display: flex;
+    flex-direction: column;
+    gap: var(--knr-pm-gap, 8px);
+  }
+
+  .knr-pm__hero {
+    overflow: hidden;
+    background: var(--knr-sand-dark);
+    flex-shrink: 0;
+  }
+
+.knr-pm__hero img {
+    width: 100%;
+    display: block;
+    transition: transform .5s ease;
+  
+    width: 100%;
+     height: 100%; 
+    min-height: 100vh;
+    display: block;
+    object-fit: cover;
+    object-position: center;
+}
+
+  .knr-pm__hero:hover img { transform: scale(1.02); }
+.knr-pm__sub-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--knr-pm-gap, 8px);
+    grid-template-columns: 34% 34%;
+}
+
+  .knr-pm__media-item {
+    position: relative;
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: var(--knr-sand-dark);
+    cursor: zoom-in;
+  }
+
+  .knr-pm__media-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform .5s ease;
+  }
+
+  .knr-pm__media-item:hover img { transform: scale(1.04); }
+
+  .knr-pm__zoom-icon {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    width: 28px;
+    height: 28px;
+    background: rgba(250,249,247,.85);
+    backdrop-filter: blur(4px);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .2s;
+  }
+
+  .knr-pm__zoom-icon svg {
+    width: 12px;
+    height: 12px;
+    stroke: var(--knr-ink);
+    stroke-width: 2;
+    fill: none;
+  }
+
+  .knr-pm__media-item:hover .knr-pm__zoom-icon { opacity: 1; }
+
+  /* Lightbox */
+  .knr-pm__lb {
+    position: fixed;
+    inset: 0;
+    background: rgba(28,28,26,.92);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s;
+  }
+
+  .knr-pm__lb.is-open { opacity: 1; pointer-events: all; }
+
+  .knr-pm__lb img {
+    max-width: 90vw;
+    max-height: 90vh;
+    object-fit: contain;
+    display: block;
+  }
+
+  .knr-pm__lb-close {
+    position: absolute;
+    top: 20px;
+    right: 24px;
+    background: none;
+    border: none;
+    color: var(--knr-cream);
+    font-size: 30px;
+    cursor: pointer;
+    line-height: 1;
+    font-family: var(--knr-font);
+  }
+
+  /* Mobile slider */
+  .knr-pm__mobile-strip {
+    display: none;
+    position: relative;
+    background: var(--knr-sand-dark);
+    isolation: isolate;
+  }
+
+  .knr-pm__mobile-track {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y pinch-zoom;
+  }
+
+  .knr-pm__mobile-track::-webkit-scrollbar { display: none; }
+
+  .knr-pm__mobile-slide {
+    position: relative;
+    flex: 0 0 100%;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    overflow: hidden;
+  }
+
+  .knr-pm__mobile-slide img,
+  .knr-pm__mobile-slide video {
+    width: 100%;
+    height: clamp(360px, 108vw, 640px);
+    object-fit: cover;
+    display: block;
+  }
+
+  .knr-pm__mobile-next {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: var(--knr-ink);
+    cursor: pointer;
+    z-index: 6;
+    padding: 0;
+    pointer-events: auto;
+    touch-action: manipulation;
+    user-select: none;
+    appearance: none;
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .knr-pm__mobile-next::before {
+    content: '';
+    position: absolute;
+    inset: -14px;
+  }
+
+  .knr-pm__mobile-next svg {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    fill: none;
+  }
+
+  .knr-pm__mobile-next[disabled] {
+    opacity: .35;
+    cursor: default;
+  }
+
+  .knr-pm__mobile-progress {
+    position: absolute;
+    left: 50%;
+    bottom: 22px;
+    transform: translateX(-50%);
+    width: var(--knr-pm-mobile-progress-width, 170px);
+    height: var(--knr-pm-mobile-progress-thickness, 2px);
+    background: rgba(255, 255, 255, 0.98);
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 3;
+    border-radius: 999px;
+  }
+
+  .knr-pm__mobile-progress-bar {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 33.3333%;
+    height: 100%;
+    background: #111111;
+    transition: left .22s ease, width .22s ease;
+    will-change: left, width;
+    border-radius: inherit;
+  }
+
+.knr-pm__info {
+    position: absolute;
+    top: 181px;
+    /* max-height: 100%; */
+    /* overflow-y: auto; */
+    max-height: calc(100vh -);
+    scrollbar-width: none;
+    padding: 40px;
+    border-left: 1px solid var(--knr-border);
+    transform: translateX(-57px);
+    background: #FFFFFF;
+    right: -14px;
+    z-index: 1000;
+}
+  .knr-pm__info::-webkit-scrollbar { display: none; }
+
+  /* Breadcrumb */
+  .knr-pm__crumb {
+    font-size: 11px;
+    color: var(--knr-gold);
+    letter-spacing: .05em;
+    margin-bottom: 40px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    align-items: center;
+  }
+
+  .knr-pm__crumb a { color: inherit; transition: opacity .15s; }
+  .knr-pm__crumb a:hover { opacity: .7; }
+  .knr-pm__crumb-sep { opacity: .55; }
+
+  /* Badges */
+  .knr-pm__badges {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .knr-pm__badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 36px;
+    background: var(--knr-pm-badge-bg);
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    color: var(--knr-pm-badge-text);
+    border: 1px solid var(--knr-pm-badge-border);
+    padding: 7px 12px;
+    line-height: 1;
+    white-space: nowrap;
+    transition: background-color .2s ease, color .2s ease, border-color .2s ease;
+  }
+
+  .knr-pm__badge:hover {
+    background: var(--knr-pm-badge-text);
+    color: var(--knr-pm-badge-bg);
+    border-color: var(--knr-pm-badge-text);
+  }
+
+  /* Title + rating */
+  .knr-pm__title-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 10px;
+  }
+  .knr-pm__title {
+      color: var(--knr-ink);
+      margin: 0;
+      flex: 1;
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      font-style: normal;
+      font-size: 24px;
+      line-height: 32px;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      vertical-align: middle;
+  }
+
+  .knr-pm__rating {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    flex-shrink: 0;
+    padding-top: 4px;
+  }
+
+  .knr-pm__stars {
+    display: flex;
+    gap: 1px;
+  }
+
+  .knr-pm__stars svg {
+    width: 11px;
+    height: 11px;
+  }
+
+  .knr-pm__review-count {
+    font-size: 10px;
+    color: var(--knr-ink-60);
+    white-space: nowrap;
+    letter-spacing: .03em;
+  }
+
+  /* Certifications */
+.knr-pm__certs {
+    font-size: 12px;
+    color: var(--knr-ink);
+    margin: 18px 0 12px;
+    letter-spacing: .01em;
+    font-family: 'Inter';
+    font-weight: bold;
+}
+
+  /* Short description */
+.knr-pm__short-desc {
+    font-size: 12px;
+    line-height: 1.72;
+    color: #000;
+    margin: 0 0 40px;
+    font-weight: 400;
+}
+
+  /* Divider */
+  .knr-pm__divider {
+    height: 1px;
+    background: var(--knr-border);
+    margin: 14px 0;
+  }
+
+  /* Variants */
+  .knr-pm__option { margin-bottom: 14px; }
+
+  .knr-pm__option-label {
+    font-size: 12px;
+    letter-spacing: .05em;
+    color: #000;
+    margin-bottom: 16px;
+     font-weight: 400;
+  }
+
+  .knr-pm__option-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .knr-pm__opt-pill {
+    font-family: var(--knr-font);
+    font-size: 13px;
+    color: var(--knr-ink-60);
+    background: none;
+    border: none;
+    border-bottom: 1.5px solid transparent;
+    padding: 0 0 2px;
+    cursor: pointer;
+    letter-spacing: .03em;
+    transition: color .15s, border-color .15s;
+  }
+
+  .knr-pm__opt-pill:hover:not([disabled]) { color: var(--knr-ink); }
+
+  .knr-pm__opt-pill.is-selected {
+
+        color: var(--knr-ink);
+    border-bottom-color: var(--knr-ink);
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 32px;
+  }
+
+  .knr-pm__opt-pill[disabled] {
+    opacity: .3;
+    cursor: not-allowed;
+    text-decoration: line-through;
+  }
+
+  /* Price */
+ .knr-pm__price {
+    font-size: 24px;
+    font-weight: 400;
+    color: var(--knr-ink);
+    letter-spacing: .01em;
+    margin-top: 12px;
+    margin-bottom: 30px;
+}
+
+  .knr-pm__price {
+    font-size: 24px;
+    font-weight: 400;
+    color: var(--knr-ink);
+    letter-spacing: .01em;
+
+  }
+
+  .knr-pm__compare {
+    font-size: 14px;
+    color: var(--knr-ink-60);
+    text-decoration: line-through;
+  }
+
+  .knr-pm__unit-price {
+    font-size: 11px;
+    color: var(--knr-ink-60);
+    margin: 0 0 18px;
+    letter-spacing: .02em;
+  }
+
+  /* ATC */
+  .knr-pm__atc-wrap { margin-bottom: 10px; }
+
+  .knr-pm__atc {
+    width: 100%;
+    height: 52px;
+    background: var(--knr-ink);
+    color: var(--knr-cream);
+    border: 1px solid var(--knr-ink);
+    font-family: var(--knr-font);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: background-color .2s, color .2s;
+  }
+
+  .knr-pm__atc:hover:not(:disabled) {
+    background: transparent;
+    color: var(--knr-ink);
+  }
+
+  .knr-pm__atc:disabled { opacity: .4; cursor: not-allowed; }
+
+  .knr-pm__atc-spinner {
+    width: 14px;
+    height: 14px;
+    border: 1.5px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: knrPmSpin .55s linear infinite;
+    display: none;
+    flex-shrink: 0;
+  }
+
+  .knr-pm__atc.loading .knr-pm__atc-spinner { display: block; }
+  .knr-pm__atc.loading .knr-pm__atc-lbl { display: none; }
+
+  @keyframes knrPmSpin { to { transform: rotate(360deg); } }
+
+  /* Delivery */
+  .knr-pm__delivery {
+    font-size: 11.5px;
+    color: var(--knr-ink-60);
+    text-align: center;
+    margin: 0 0 14px;
+    line-height: 1.5;
+    letter-spacing: .01em;
+  }
+
+  /* Ship dots */
+  .knr-pm__ship-dots {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: center;
+    margin-bottom: 18px;
+  }
+
+  .knr-pm__ship-dot {
+    width: 22px;
+    height: 3px;
+    background: var(--knr-border);
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .knr-pm__ship-dot.active { background: var(--knr-ink); }
+
+  /* Reassurance strip */
+  .knr-pm__reassurance {
+    display: flex;
+    gap: 10px;
+    padding: 14px 0;
+    border-top: 1px solid var(--knr-border);
+    border-bottom: 1px solid var(--knr-border);
+    margin-bottom: 6px;
+  }
+
+  .knr-pm__reassure-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+  }
+
+  .knr-pm__reassure-item svg {
+    width: 18px;
+    height: 18px;
+    stroke: var(--knr-ink-60);
+    stroke-width: 1.3;
+    fill: none;
+  }
+
+  .knr-pm__reassure-item span {
+    font-size: 9px;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--knr-ink-60);
+    line-height: 1.4;
+  }
+
+  /* Accordions */
+  .knr-pm__accord-wrap { margin-top: 6px; }
+
+  .knr-pm__accord { border-top: 1px solid var(--knr-border); }
+  .knr-pm__accord:last-child { border-bottom: 1px solid var(--knr-border); }
+
+  .knr-pm__accord-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 0;
+    background: none;
+    border: none;
+    font-family: var(--knr-font);
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--knr-ink);
+    letter-spacing: .02em;
+    cursor: pointer;
+    text-align: left;
+    gap: 12px;
+    transition: opacity .15s;
+  }
+
+  .knr-pm__accord-toggle::-webkit-details-marker { display: none; }
+  .knr-pm__accord-toggle::marker { content: ''; }
+
+  .knr-pm__accord-toggle:hover { opacity: .65; }
+
+  .knr-pm__accord-icon {
+    width: 16px;
+    height: 16px;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .knr-pm__accord-icon::before,
+  .knr-pm__accord-icon::after {
+    content: '';
+    position: absolute;
+    background: var(--knr-ink-60);
+    transition: transform .22s ease, opacity .22s ease;
+  }
+
+  .knr-pm__accord-icon::before {
+    width: 12px; height: 1px; top: 50%; left: 2px;
+    transform: translateY(-50%);
+  }
+
+  .knr-pm__accord-icon::after {
+    width: 1px; height: 12px; left: 7px; top: 2px;
+  }
+
+  .knr-pm__accord[open] .knr-pm__accord-icon::after {
+    transform: scaleY(0);
+    opacity: 0;
+  }
+
+  .knr-pm__accord-body {
+    display: grid;
+    grid-template-rows: 1fr;
+  }
+
+  .knr-pm__accord-content {
+    padding-bottom: 18px;
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--knr-ink-60);
+  }
+
+  .knr-pm__accord-content p + p { margin-top: 8px; }
+  .knr-pm__accord-content ul { list-style: disc; padding-left: 18px; }
+  .knr-pm__accord-content li + li { margin-top: 4px; }
+
+  /* ─── Ritual ─── */
+  .knr-pm__ritual {
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px solid var(--knr-border);
+  }
+
+  .knr-pm__ritual-hd {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .knr-pm__ritual-title {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--knr-ink);
+    margin: 0;
+  }
+
+  .knr-pm__ritual-next {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--knr-ink);
+    display: flex;
+    padding: 4px;
+    transition: transform .15s;
+  }
+
+  .knr-pm__ritual-next:hover { transform: translateX(3px); }
+
+  .knr-pm__ritual-next svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    fill: none;
+  }
+
+  .knr-pm__ritual-track {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    cursor: grab;
+  }
+
+  .knr-pm__ritual-track::-webkit-scrollbar { display: none; }
+  .knr-pm__ritual-track.is-dragging { cursor: grabbing; scroll-snap-type: none; }
+
+  .knr-pm__ritual-card {
+    flex: 0 0 calc(33.333% - 7px);
+    scroll-snap-align: start;
+  }
+
+  .knr-pm__ritual-img {
+    aspect-ratio: 3/4;
+    overflow: hidden;
+    background: var(--knr-sand-dark);
+    margin-bottom: 9px;
+    position: relative;
+  }
+
+  .knr-pm__ritual-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .4s ease;
+  }
+
+  .knr-pm__ritual-card:hover .knr-pm__ritual-img img { transform: scale(1.04); }
+
+  .knr-pm__ritual-qadd {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    width: 26px;
+    height: 26px;
+    background: var(--knr-cream);
+    border: 1px solid var(--knr-border);
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    line-height: 1;
+    color: var(--knr-ink);
+    transition: background-color .15s, border-color .15s, color .15s;
+    padding: 0;
+    font-family: var(--knr-font);
+  }
+
+  .knr-pm__ritual-qadd:hover {
+    background: var(--knr-ink);
+    border-color: var(--knr-ink);
+    color: var(--knr-cream);
+  }
+
+  .knr-pm__ritual-qadd.loading { opacity: .5; pointer-events: none; }
+  .knr-pm__ritual-qadd.added   { background: var(--knr-ink); border-color: var(--knr-ink); color: var(--knr-cream); }
+
+  .knr-pm__ritual-name {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--knr-ink);
+    margin: 0 0 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: .02em;
+  }
+
+  .knr-pm__ritual-price {
+    font-size: 11px;
+    color: var(--knr-ink-60);
+    margin: 0;
+  }
+
+  .knr-pm__ritual-compare {
+    text-decoration: line-through;
+    margin-left: 5px;
+  }
+
+  /* ─── Responsive ─── */
+  @media (max-width: 860px) {
+    .knr-pm {
+      grid-template-columns: 1fr;
+    }
+
+    .knr-pm__gallery { display: none; }
+    .knr-pm__mobile-strip { display: block; }
+
+    .knr-pm__info {
+      position: static;
+      height: auto;
+      max-height: none;
+      overflow-y: visible;
+      padding: 24px 20px 48px;
+      border-left: none;
+      border-right: none;
+      transform: none;
+      margin: 0 16px;
+    }
+
+    .knr-pm__title { font-size: 20px; }
+    .knr-pm__price { font-size: 20px; }
+
+    .knr-pm__ritual-card {
+      flex: 0 0 calc(50% - 5px);
+    }
+  }
+
+  @media (max-width: 600px) {
+    .knr-pm__ritual-card {
+      flex: 0 0 calc(75% - 5px);
+    }
+    .knr-pm__badges {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 24px;
+    position: absolute;
+    top: 142px;
+    transform: translateX(-60px);
+    left: 50%;
+}
+.knr-pm {
+    grid-template-columns: 1fr;
+    background: #dfdace;
+}
+  }
+    @media (min-width: 768px) {
+      .knr-pm__info {
+    position: absolute;
+    top: 181px;
+    /* max-height: 100%; */
+    /* overflow-y: auto; */
+    max-height: calc(100vh -);
+    scrollbar-width: none;
+    padding: 40px;
+    border-left: 1px solid var(--knr-border);
+    transform: translateX(-57px);
+    background: #FFFFFF;
+    width: 456px;
+    /* left: 109px; */
+    right: -14px;
+    z-index: 1000;
+}
+
+    }
+</style>
+
+{%- comment -%} Mobile gallery slider (above the grid) {%- endcomment -%}
+<div
+  class="knr-pm__mobile-strip"
+  id="knrPmMobileSlider-{{ section.id }}"
+  style="--knr-pm-mobile-progress-width: {{ section.settings.mobile_progress_width }}px; --knr-pm-mobile-progress-thickness: {{ section.settings.mobile_progress_thickness }}px;"
+>
+  <div
+    class="knr-pm__mobile-track"
+    id="knrPmMobileTrack-{{ section.id }}"
+    role="region"
+    aria-label="{{ product.title | escape }} media"
+  >
+    {%- for media in product.media limit: 8 -%}
+      <div class="knr-pm__mobile-slide" data-mobile-slide>
+        {%- if media.media_type == 'video' or media.media_type == 'external_video' -%}
+          {{- media | video_tag: autoplay: false, muted: true, loop: true, playsinline: true, image_size: '900x' -}}
+        {%- else -%}
+          <img
+            src="{{ media | image_url: width: 900 }}"
+            alt="{{ media.alt | default: product.title | escape }}"
+            width="900"
+            height="900"
+            loading="{{ forloop.first | replace: 'true', 'eager' | replace: 'false', 'lazy' }}"
+          >
+        {%- endif -%}
+      </div>
+    {%- endfor -%}
+  </div>
+
+  {%- if product.media.size > 1 -%}
+    <button
+      class="knr-pm__mobile-next"
+      id="knrPmMobileNext-{{ section.id }}"
+      type="button"
+      aria-label="Media suivante"
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
+    </button>
+
+    <div class="knr-pm__mobile-progress" aria-hidden="true">
+      <span class="knr-pm__mobile-progress-bar" id="knrPmMobileProgress-{{ section.id }}"></span>
+    </div>
+  {%- endif -%}
+</div>
+
+<section
+  id="knrPmSection-{{ section.id }}"
+  class="knr-pm{% if section.settings.info_position == 'left' %} knr-pm--info-left{% endif %}"
+  style="--knr-pm-gap: {{ section.settings.image_gap }}px; --knr-pm-badge-bg: {{ section.settings.info_badge_bg_color }}; --knr-pm-badge-text: {{ section.settings.info_badge_text_color }}; --knr-pm-badge-border: {{ section.settings.info_badge_border_color }};"
+>
+
+  <!-- ─ Gallery ─ -->
+  <div class="knr-pm__gallery">
+
+    {%- assign hero = product.media.first -%}
+    <div class="knr-pm__hero">
+      {%- if hero.media_type == 'video' or hero.media_type == 'external_video' -%}
+        {{- hero | video_tag: autoplay: true, muted: true, loop: true, playsinline: true, image_size: '1200x' -}}
+      {%- else -%}
+        <img
+          src="{{ hero | image_url: width: 1200 }}"
+          alt="{{ hero.alt | default: product.title | escape }}"
+          id="knrPmHero"
+          width="800" height="1000"
+          loading="eager"
+          fetchpriority="high"
+          data-lb="{{ hero | image_url: width: 2400 }}"
+        >
+      {%- endif -%}
+    </div>
+
+    {%- if product.media.size > 1 -%}
+      <div class="knr-pm__sub-grid">
+        {%- for media in product.media offset: 1 -%}
+          <div class="knr-pm__media-item" data-lb="{{ media | image_url: width: 2000 }}">
+            {%- if media.media_type == 'video' or media.media_type == 'external_video' -%}
+              {{- media | video_tag: autoplay: false, muted: true, loop: true, playsinline: true, image_size: '800x' -}}
+            {%- else -%}
+              <img
+                src="{{ media | image_url: width: 800 }}"
+                alt="{{ media.alt | default: product.title | escape }}"
+                width="540" height="540"
+                loading="lazy"
+              >
+            {%- endif -%}
+            <span class="knr-pm__zoom-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </span>
+          </div>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+  </div>
+
+  <!-- ─ Info panel ─ -->
+  <div class="knr-pm__info">
+
+    <!-- Breadcrumb -->
+    <nav class="knr-pm__crumb" aria-label="Fil d'Ariane">
+      {%- if collection -%}
+        <a href="{{ collection.url }}">{{ collection.title }}</a>
+        {%- if section.settings.crumb_sub != blank -%}
+          <span class="knr-pm__crumb-sep" aria-hidden="true">/</span>
+          <span>{{ section.settings.crumb_sub }}</span>
+        {%- endif -%}
+      {%- else -%}
+        <a href="{{ routes.root_url }}">Accueil</a>
+        {%- if section.settings.crumb_sub != blank -%}
+          <span class="knr-pm__crumb-sep" aria-hidden="true">/</span>
+          <span>{{ section.settings.crumb_sub }}</span>
+        {%- endif -%}
+      {%- endif -%}
+    </nav>
+
+    <!-- Badges from metafield custom.product_badges or section fallback -->
+    {%- assign badges_raw = product.metafields.custom.product_badges.value -%}
+    {%- if badges_raw != blank or section.settings.info_badge_1 != blank or section.settings.info_badge_2 != blank -%}
+      <div class="knr-pm__badges">
+        {%- if badges_raw != blank -%}
+          {%- assign badge_list = badges_raw | split: ',' -%}
+          {%- for badge in badge_list -%}
+            <span class="knr-pm__badge">{{ badge | strip }}</span>
+          {%- endfor -%}
+        {%- else -%}
+          {%- if section.settings.info_badge_1 != blank -%}
+            <span class="knr-pm__badge">{{ section.settings.info_badge_1 }}</span>
+          {%- endif -%}
+          {%- if section.settings.info_badge_2 != blank -%}
+            <span class="knr-pm__badge">{{ section.settings.info_badge_2 }}</span>
+          {%- endif -%}
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <!-- Title + Rating -->
+    <div class="knr-pm__title-row">
+      <h1 class="knr-pm__title" itemprop="name">{{ product.title }}</h1>
+
+      {%- if section.settings.show_rating -%}
+        <div class="knr-pm__rating" aria-label="{{ section.settings.rating_score }} étoiles sur 5">
+          <div class="knr-pm__stars" aria-hidden="true">
+            {%- assign rscore = section.settings.rating_score | plus: 0 | floor -%}
+            {%- for i in (1..5) -%}
+              <svg viewBox="0 0 12 12"
+                fill="{% if i <= rscore %}var(--knr-gold){% else %}none{% endif %}"
+                stroke="var(--knr-gold)"
+                stroke-width="1.2"
+              >
+                <path d="M6 1l1.4 2.8 3.1.5-2.3 2.2.6 3.1L6 8.1 3.2 9.6l.6-3.1L1.5 4.3l3.1-.5z"/>
+              </svg>
+            {%- endfor -%}
+          </div>
+          <div class="knr-pm__review-count">{{ section.settings.rating_count }} avis</div>
+        </div>
+      {%- endif -%}
+    </div>
+
+    <!-- Certifications line -->
+    {%- if section.settings.certifications != blank -%}
+      <p class="knr-pm__certs">{{ section.settings.certifications }}</p>
+    {%- endif -%}
+
+    <!-- Short description -->
+    {%- if short_desc != blank -%}
+      <p class="knr-pm__short-desc">{{ short_desc }}</p>
+    {%- endif -%}
+
+    <div class="knr-pm__divider"></div>
+
+    <!-- Variants -->
+    {%- if has_variants -%}
+      <div id="knrPmOptions">
+        {%- for option in product.options_with_values -%}
+          <div class="knr-pm__option" data-option-pos="{{ forloop.index0 }}">
+            <div class="knr-pm__option-label">{{ option.name }}</div>
+            <div class="knr-pm__option-pills" role="group" aria-label="{{ option.name }}">
+              {%- for val in option.values -%}
+                <button
+                  type="button"
+                  class="knr-pm__opt-pill{% if option.selected_value == val %} is-selected{% endif %}"
+                  data-opt="{{ forloop.parentloop.index0 }}"
+                  data-val="{{ val | escape }}"
+                  aria-pressed="{% if option.selected_value == val %}true{% else %}false{% endif %}"
+                >{{ val }}</button>
+              {%- endfor -%}
+            </div>
+          </div>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    <!-- Price -->
+    <div id="knrPmPriceBlock">
+      <div class="knr-pm__price-row">
+        <span class="knr-pm__price" id="knrPmPrice">{{ current_variant.price | money }}</span>
+        {%- if current_variant.compare_at_price > current_variant.price -%}
+          <span class="knr-pm__compare" id="knrPmCompare">{{ current_variant.compare_at_price | money }}</span>
+        {%- else -%}
+          <span class="knr-pm__compare" id="knrPmCompare" hidden></span>
+        {%- endif -%}
+      </div>
+      {%- if current_variant.unit_price_measurement -%}
+        <p class="knr-pm__unit-price" id="knrPmUnitPrice">
+          {{ current_variant.unit_price | money }}
+          {%- if current_variant.unit_price_measurement.reference_value != 1 -%}
+            {{ current_variant.unit_price_measurement.reference_value }}
+          {%- endif -%}
+          {{ current_variant.unit_price_measurement.reference_unit }}
+        </p>
+      {%- else -%}
+        <p class="knr-pm__unit-price" id="knrPmUnitPrice" hidden></p>
+      {%- endif -%}
+    </div>
+
+    <!-- Add to cart -->
+    <div class="knr-pm__atc-wrap">
+      <form id="{{ product_form_id }}" action="{{ routes.cart_add_url }}" method="post" novalidate>
+        <input type="hidden" name="id" id="knrPmVarId" value="{{ current_variant.id }}">
+        <input type="hidden" name="quantity" value="1">
+        <button
+          type="submit"
+          name="add"
+          class="knr-pm__atc"
+          id="knrPmAtcBtn"
+          {%- unless current_variant.available %} disabled{%- endunless -%}
+        >
+          <span class="knr-pm__atc-spinner" aria-hidden="true"></span>
+          <span class="knr-pm__atc-lbl">
+            {%- if current_variant.available -%}Ajouter au panier{%- else -%}Indisponible{%- endif -%}
+          </span>
+        </button>
+      </form>
+    </div>
+
+    <!-- Delivery message -->
+    {%- if delivery_msg != blank -%}
+      <p class="knr-pm__delivery">{{ delivery_msg }}</p>
+    {%- endif -%}
+
+    <!-- Shipping progress dots -->
+    {%- if section.settings.show_ship_dots -%}
+      <div class="knr-pm__ship-dots" aria-hidden="true">
+        <span class="knr-pm__ship-dot active"></span>
+        <span class="knr-pm__ship-dot active"></span>
+        <span class="knr-pm__ship-dot"></span>
+        <span class="knr-pm__ship-dot"></span>
+      </div>
+    {%- endif -%}
+
+    <!-- Reassurance (blocks) -->
+    {%- assign reassure_blocks = section.blocks | where: 'type', 'reassurance' -%}
+    {%- if reassure_blocks.size > 0 -%}
+      <div class="knr-pm__reassurance" role="list">
+        {%- for block in reassure_blocks -%}
+          <div class="knr-pm__reassure-item" role="listitem" {{ block.shopify_attributes }}>
+            {%- case block.settings.icon -%}
+              {%- when 'leaf' -%}
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c1.7 0 3-.3 4.2-.8C19 19.7 22 16.2 22 12 22 6.5 17.5 2 12 2z"/><path d="M12 2v20M2 12h20"/></svg>
+              {%- when 'shield' -%}
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              {%- when 'truck' -%}
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+              {%- when 'recycle' -%}
+                <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><path d="M20.5 15a9 9 0 11-2.1-9.4L23 10"/></svg>
+            {%- endcase -%}
+            <span>{{ block.settings.label }}</span>
+          </div>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    <!-- Accordions -->
+    {%- assign accord_blocks = section.blocks | where: 'type', 'accordion' -%}
+    {%- if accord_blocks.size > 0 -%}
+      <div class="knr-pm__accord-wrap">
+        {%- for block in accord_blocks -%}
+          {%- liquid
+            case block.settings.content_source
+              when 'product_desc'
+                assign accord_body = product.description
+              when 'desc_tab'
+                assign accord_body = desc_tab
+              when 'benefits'
+                assign accord_body = bene_tab
+              when 'ingredients'
+                assign accord_body = ingr_tab
+              when 'skin_types'
+                assign accord_body = skin_tab
+              else
+                assign accord_body = block.settings.custom_content
+            endcase
+          -%}
+          {%- if accord_body != blank or block.settings.content_source == 'product_desc' -%}
+            <details class="knr-pm__accord" {% if forloop.first %}open{% endif %} {{ block.shopify_attributes }}>
+              <summary
+                class="knr-pm__accord-toggle"
+                aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}"
+                aria-controls="knrPmAcc{{ block.id }}"
+              >
+                <span>{{ block.settings.heading }}</span>
+                <span class="knr-pm__accord-icon" aria-hidden="true"></span>
+              </summary>
+              <div class="knr-pm__accord-body" id="knrPmAcc{{ block.id }}" role="region">
+                <div class="knr-pm__accord-content">{{ accord_body }}</div>
+              </div>
+            </details>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    <!-- Ritual products -->
+    {%- if ritual_prods != blank and ritual_prods.size > 0 -%}
+      <div class="knr-pm__ritual">
+        <div class="knr-pm__ritual-hd">
+          <h2 class="knr-pm__ritual-title">
+            {{ section.settings.ritual_title | default: 'Complétez votre rituel' }}
+          </h2>
+          <button class="knr-pm__ritual-next" id="knrRitualNext" aria-label="Suivant">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+
+        <div class="knr-pm__ritual-track" id="knrRitualTrack" role="list">
+          {%- for rp in ritual_prods -%}
+            {%- assign rv = rp.selected_or_first_available_variant -%}
+            <div class="knr-pm__ritual-card" role="listitem">
+              <div class="knr-pm__ritual-img">
+                {%- if rp.featured_media -%}
+                  <img
+                    src="{{ rp.featured_media | image_url: width: 400 }}"
+                    alt="{{ rp.title | escape }}"
+                    width="280" height="373"
+                    loading="lazy"
+                  >
+                {%- endif -%}
+                <button
+                  class="knr-pm__ritual-qadd"
+                  type="button"
+                  data-vid="{{ rv.id }}"
+                  aria-label="Ajouter {{ rp.title | escape }}"
+                  {%- unless rv.available %} disabled{%- endunless -%}
+                >+</button>
+              </div>
+              <p class="knr-pm__ritual-name">{{ rp.title }}</p>
+              <p class="knr-pm__ritual-price">
+                {{ rv.price | money }}
+                {%- if rv.compare_at_price > rv.price -%}
+                  <span class="knr-pm__ritual-compare">{{ rv.compare_at_price | money }}</span>
+                {%- endif -%}
+              </p>
+            </div>
+          {%- endfor -%}
+        </div>
+      </div>
+    {%- endif -%}
+
+  </div>
+</section>
+
+<!-- Lightbox -->
+<div class="knr-pm__lb" id="knrPmLb" role="dialog" aria-modal="true" aria-label="Vue agrandie">
+  <button class="knr-pm__lb-close" id="knrPmLbClose" aria-label="Fermer">&times;</button>
+  <img src="{{ product.featured_image | image_url: width: 1200 }}" alt="{{ product.title | escape }}" id="knrPmLbImg" width="1200" height="1200" loading="lazy">
+</div>
+
+<script type="application/json" id="knrPmVariantData">{{ product.variants | json }}</script>
+
+<script>
+  (() => {
+    const variants = JSON.parse(document.getElementById('knrPmVariantData').textContent);
+    const selectedOpts = [
+      {%- for opt in product.options_with_values -%}
+        {{ opt.selected_value | json }}{%- unless forloop.last -%},{%- endunless -%}
+      {%- endfor -%}
+    ];
+
+    const findVariant = () => variants.find(v => v.options.every((o, i) => o === selectedOpts[i]));
+
+    const fmtMoney = cents => {
+      const amt = (cents / 100).toFixed(2).replace('.', ',');
+      return amt + ' €';
+    };
+
+    const updateUI = () => {
+      const v = findVariant();
+      if (!v) return;
+
+      // price
+      const priceEl   = document.getElementById('knrPmPrice');
+      const compareEl = document.getElementById('knrPmCompare');
+      const unitEl    = document.getElementById('knrPmUnitPrice');
+      if (priceEl)   priceEl.textContent = fmtMoney(v.price);
+      if (compareEl) {
+        if (v.compare_at_price && v.compare_at_price > v.price) {
+          compareEl.textContent = fmtMoney(v.compare_at_price);
+          compareEl.hidden = false;
+        } else {
+          compareEl.hidden = true;
+        }
+      }
+      if (unitEl) unitEl.hidden = !v.unit_price_measurement;
+
+      // form + button
+      const varInput = document.getElementById('knrPmVarId');
+      const atcBtn   = document.getElementById('knrPmAtcBtn');
+      const atcLbl   = atcBtn?.querySelector('.knr-pm__atc-lbl');
+      if (varInput) varInput.value   = v.id;
+      if (atcBtn)   atcBtn.disabled  = !v.available;
+      if (atcLbl)   atcLbl.textContent = v.available ? 'Ajouter au panier' : 'Indisponible';
+
+      // url
+      const u = new URL(window.location.href);
+      u.searchParams.set('variant', v.id);
+      window.history.replaceState({}, '', u);
+    };
+
+    // Variant pills
+    document.querySelectorAll('.knr-pm__opt-pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (btn.disabled) return;
+        const pos = +btn.dataset.opt;
+        selectedOpts[pos] = btn.dataset.val;
+        btn.closest('.knr-pm__option-pills').querySelectorAll('.knr-pm__opt-pill').forEach(b => {
+          const active = b.dataset.val === btn.dataset.val;
+          b.classList.toggle('is-selected', active);
+          b.setAttribute('aria-pressed', String(active));
+        });
+        updateUI();
+      });
+    });
+
+    // ATC — main form
+    const pmForm = document.getElementById('{{ product_form_id }}');
+    if (pmForm) {
+      pmForm.addEventListener('submit', async e => {
+        e.preventDefault();
+        const btn = document.getElementById('knrPmAtcBtn');
+        const lbl = btn?.querySelector('.knr-pm__atc-lbl');
+        const origText = lbl?.textContent;
+        btn.classList.add('loading');
+        btn.disabled = true;
+
+        try {
+          const res = await fetch('/cart/add.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: document.getElementById('knrPmVarId').value, quantity: 1 })
+          });
+          if (!res.ok) throw new Error('add failed');
+          const cart = await (await fetch('/cart.js')).json();
+          document.dispatchEvent(new CustomEvent('knr:cart:updated', { detail: cart, bubbles: true }));
+          if (lbl) lbl.textContent = 'Ajouté ✓';
+          setTimeout(() => {
+            if (lbl) lbl.textContent = origText;
+            btn.disabled = false;
+          }, 2200);
+        } catch (_) {
+          btn.disabled = false;
+        }
+
+        btn.classList.remove('loading');
+      });
+    }
+
+    // Ritual quick-add
+    document.querySelectorAll('.knr-pm__ritual-qadd').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        if (btn.disabled || btn.classList.contains('loading')) return;
+        btn.classList.add('loading');
+        const origContent = btn.innerHTML;
+        btn.innerHTML = '<span style="width:10px;height:10px;border:1.5px solid currentColor;border-top-color:transparent;border-radius:50%;display:inline-block;animation:knrPmSpin .55s linear infinite;vertical-align:middle"></span>';
+
+        try {
+          await fetch('/cart/add.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: btn.dataset.vid, quantity: 1 })
+          });
+          const cart = await (await fetch('/cart.js')).json();
+          document.dispatchEvent(new CustomEvent('knr:cart:updated', { detail: cart, bubbles: true }));
+          btn.innerHTML = '✓';
+          btn.classList.add('added');
+          setTimeout(() => {
+            btn.innerHTML = origContent;
+            btn.classList.remove('loading', 'added');
+          }, 2000);
+        } catch (_) {
+          btn.innerHTML = origContent;
+          btn.classList.remove('loading');
+        }
+      });
+    });
+
+    // Ritual slider — drag + arrow
+    const track = document.getElementById('knrRitualTrack');
+    if (track) {
+      let isDragging = false, startX = 0, scrollStart = 0;
+
+      track.addEventListener('mousedown', e => {
+        isDragging = true;
+        startX = e.pageX;
+        scrollStart = track.scrollLeft;
+        track.classList.add('is-dragging');
+      });
+
+      const endDrag = () => { isDragging = false; track.classList.remove('is-dragging'); };
+      track.addEventListener('mouseup', endDrag);
+      track.addEventListener('mouseleave', endDrag);
+
+      track.addEventListener('mousemove', e => {
+        if (!isDragging) return;
+        e.preventDefault();
+        track.scrollLeft = scrollStart - (e.pageX - startX);
+      });
+
+      document.getElementById('knrRitualNext')?.addEventListener('click', () => {
+        const card = track.querySelector('.knr-pm__ritual-card');
+        if (card) track.scrollBy({ left: card.offsetWidth + 10, behavior: 'smooth' });
+      });
+    }
+
+    // Accordions
+    document.querySelectorAll('.knr-pm').forEach(sectionEl => {
+      const accordions = sectionEl.querySelectorAll('.knr-pm__accord');
+      if (!accordions.length) return;
+
+      accordions.forEach(accordion => {
+        const toggle = accordion.querySelector('.knr-pm__accord-toggle');
+        toggle?.setAttribute('aria-expanded', String(accordion.open));
+
+        accordion.addEventListener('toggle', () => {
+          toggle?.setAttribute('aria-expanded', String(accordion.open));
+          if (!accordion.open) return;
+
+          accordions.forEach(item => {
+            if (item !== accordion && item.open) {
+              item.open = false;
+              item.querySelector('.knr-pm__accord-toggle')?.setAttribute('aria-expanded', 'false');
+            }
+          });
+        });
+      });
+    });
+
+    // Lightbox
+    const lb      = document.getElementById('knrPmLb');
+    const lbImg   = document.getElementById('knrPmLbImg');
+    const lbClose = document.getElementById('knrPmLbClose');
+
+    const openLb = src => {
+      if (!lb || !lbImg || !src) return;
+      lbImg.src = src;
+      lb.classList.add('is-open');
+      document.body.style.overflow = 'hidden';
+    };
+
+    const closeLb = () => {
+      lb?.classList.remove('is-open');
+      document.body.style.overflow = '';
+    };
+
+    document.querySelectorAll('.knr-pm__media-item[data-lb]').forEach(item => {
+      item.addEventListener('click', () => openLb(item.dataset.lb));
+    });
+
+    lbClose?.addEventListener('click', closeLb);
+    lb?.addEventListener('click', e => { if (e.target === lb) closeLb(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLb(); });
+
+    // Mobile media slider progress
+    (() => {
+      const mobileTrack = document.getElementById('knrPmMobileTrack-{{ section.id }}');
+      const mobileProgress = document.getElementById('knrPmMobileProgress-{{ section.id }}');
+      const mobileNext = document.getElementById('knrPmMobileNext-{{ section.id }}');
+      if (!mobileTrack || !mobileProgress) return;
+
+      const slides = Array.from(mobileTrack.querySelectorAll('[data-mobile-slide]'));
+      if (!slides.length) return;
+
+      let rafId = null;
+      let currentIndex = 0;
+      let lastTouchAdvanceAt = 0;
+      const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+      if (slides.length <= 1) {
+        mobileProgress.style.width = '100%';
+        mobileProgress.style.left = '0%';
+        if (mobileNext) mobileNext.hidden = true;
+        return;
+      }
+
+      const getSlideWidth = () => slides[0]?.getBoundingClientRect().width || mobileTrack.clientWidth || 0;
+
+      const goToSlide = index => {
+        const safeIndex = clamp(index, 0, slides.length - 1);
+        currentIndex = safeIndex;
+
+        const targetSlide = slides[safeIndex];
+        if (!targetSlide) return;
+
+        const targetLeft = targetSlide.offsetLeft;
+
+        try {
+          mobileTrack.scrollTo({
+            left: targetLeft,
+            behavior: 'smooth',
+          });
+        } catch (_) {
+          mobileTrack.scrollLeft = targetLeft;
+        }
+      };
+
+      const advanceSlide = event => {
+        if (event) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        const nextIndex = currentIndex + 1 >= slides.length ? 0 : currentIndex + 1;
+        goToSlide(nextIndex);
+      };
+
+      const updateProgress = () => {
+        const slideWidth = getSlideWidth();
+        const rawIndex = slideWidth ? mobileTrack.scrollLeft / slideWidth : 0;
+        const clampedIndex = clamp(rawIndex, 0, slides.length - 1);
+        currentIndex = Math.round(clampedIndex);
+        const segmentWidthPercent = 100 / slides.length;
+        mobileProgress.style.width = `${segmentWidthPercent}%`;
+        mobileProgress.style.left = `${clampedIndex * segmentWidthPercent}%`;
+      };
+
+      const queueUpdate = () => {
+        if (rafId) return;
+        rafId = window.requestAnimationFrame(() => {
+          updateProgress();
+          rafId = null;
+        });
+      };
+
+      mobileTrack.addEventListener('scroll', queueUpdate, { passive: true });
+      window.addEventListener('resize', queueUpdate);
+      slides.forEach(slide => {
+        slide.querySelectorAll('img, video').forEach(mediaEl => {
+          mediaEl.addEventListener('load', queueUpdate);
+          mediaEl.addEventListener('loadedmetadata', queueUpdate);
+        });
+      });
+      updateProgress();
+
+      if (mobileNext) {
+        mobileNext.addEventListener('pointerup', event => {
+          if (event.pointerType === 'mouse') return;
+          lastTouchAdvanceAt = Date.now();
+          advanceSlide(event);
+        });
+
+        mobileNext.addEventListener('touchend', event => {
+          lastTouchAdvanceAt = Date.now();
+          advanceSlide(event);
+        }, { passive: false });
+
+        mobileNext.addEventListener('click', event => {
+          if (Date.now() - lastTouchAdvanceAt < 450) {
+            event.preventDefault();
+            event.stopPropagation();
+            return;
+          }
+          advanceSlide(event);
+        });
+
+        mobileNext.addEventListener('keydown', event => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            advanceSlide(event);
+          }
+        });
+      }
+    })();
+
+    // Dynamic background — sample dominant color from hero image
+    {%- if section.settings.dynamic_bg -%}
+    (() => {
+      const opacity = {{ section.settings.dynamic_bg_opacity | divided_by: 100.0 }};
+      const hero = document.getElementById('knrPmHero');
+      const section = hero?.closest('.knr-pm');
+      if (!hero || !section) return;
+
+      const sample = img => {
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = canvas.height = 12;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, 12, 12);
+          const d = ctx.getImageData(0, 0, 12, 12).data;
+          let r = 0, g = 0, b = 0, n = 0;
+          for (let i = 0; i < d.length; i += 4) { r += d[i]; g += d[i+1]; b += d[i+2]; n++; }
+          const blend = v => Math.round((v / n) * opacity + 250 * (1 - opacity));
+          return `rgb(${blend(r)},${blend(g)},${blend(b)})`;
+        } catch (_) { return null; }
+      };
+
+      const apply = () => {
+        const c = sample(hero);
+        if (c) section.style.setProperty('--knr-pm-bg', c);
+      };
+
+      if (hero.complete && hero.naturalWidth) apply();
+      else hero.addEventListener('load', apply);
+    })();
+    {%- endif -%}
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "KNR Product Main",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "section_max_width",
+      "label": "Section max width",
+      "min": 960,
+      "max": 1680,
+      "step": 20,
+      "default": 1440
+    },
+    {
+      "type": "range",
+      "id": "image_gap",
+      "label": "Gallery gap (px)",
+      "min": 0, "max": 20, "step": 2, "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Mobile media slider"
+    },
+    {
+      "type": "range",
+      "id": "mobile_progress_width",
+      "label": "Progress bar width",
+      "min": 80,
+      "max": 260,
+      "step": 10,
+      "default": 170
+    },
+    {
+      "type": "range",
+      "id": "mobile_progress_thickness",
+      "label": "Progress bar thickness",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "select",
+      "id": "info_position",
+      "label": "Info panel position",
+      "default": "right",
+      "options": [
+        { "value": "right", "label": "Right" },
+        { "value": "left", "label": "Left" }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Product info"
+    },
+    {
+      "type": "text",
+      "id": "crumb_sub",
+      "label": "Breadcrumb sub-level label",
+      "info": "Second level after collection (e.g. 'Collection Cactus')"
+    },
+    {
+      "type": "text",
+      "id": "info_badge_1",
+      "label": "Product info badge 1",
+      "default": "UNIFIE"
+    },
+    {
+      "type": "text",
+      "id": "info_badge_2",
+      "label": "Product info badge 2",
+      "default": "PROTÈGE"
+    },
+    {
+      "type": "color",
+      "id": "info_badge_bg_color",
+      "label": "Product info badge background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "info_badge_text_color",
+      "label": "Product info badge text color",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "info_badge_border_color",
+      "label": "Product info badge border color",
+      "default": "#111111"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "label": "Show rating",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "rating_score",
+      "label": "Rating score",
+      "default": "4.8"
+    },
+    {
+      "type": "number",
+      "id": "rating_count",
+      "label": "Review count",
+      "default": 200
+    },
+    {
+      "type": "text",
+      "id": "certifications",
+      "label": "Certifications line (HTML allowed)",
+      "default": "<strong>Yuka</strong> 100/100 &bull; <strong>INCI Beauty</strong> 20/20"
+    },
+    {
+      "type": "textarea",
+      "id": "short_desc",
+      "label": "Short description fallback"
+    },
+    {
+      "type": "text",
+      "id": "delivery_message",
+      "label": "Delivery message fallback",
+      "default": "En stock, livraison estimée sous 2–3 jours ouvrés"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_ship_dots",
+      "label": "Show shipping progress dots",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Ritual section"
+    },
+    {
+      "type": "text",
+      "id": "ritual_title",
+      "label": "Ritual section title",
+      "default": "Complétez votre rituel"
+    },
+    {
+      "type": "header",
+      "content": "Dynamic background"
+    },
+    {
+      "type": "checkbox",
+      "id": "dynamic_bg",
+      "label": "Enable dynamic tint from product image",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "dynamic_bg_opacity",
+      "label": "Tint strength (%)",
+      "min": 0, "max": 30, "step": 2, "default": 10
+    }
+  ],
+  "blocks": [
+    {
+      "type": "accordion",
+      "name": "Accordion",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Description"
+        },
+        {
+          "type": "select",
+          "id": "content_source",
+          "label": "Content source",
+          "default": "product_desc",
+          "options": [
+            { "value": "product_desc", "label": "Product description" },
+            { "value": "desc_tab",     "label": "Metafield: custom.product_description_tab" },
+            { "value": "benefits",     "label": "Metafield: custom.benefits" },
+            { "value": "ingredients",  "label": "Metafield: custom.ingredients" },
+            { "value": "skin_types",   "label": "Metafield: custom.skin_types" },
+            { "value": "custom",       "label": "Custom richtext (below)" }
+          ]
+        },
+        {
+          "type": "richtext",
+          "id": "custom_content",
+          "label": "Custom content"
+        }
+      ]
+    },
+    {
+      "type": "reassurance",
+      "name": "Reassurance badge",
+      "limit": 4,
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "default": "leaf",
+          "options": [
+            { "value": "leaf",    "label": "Feuille" },
+            { "value": "shield",  "label": "Bouclier" },
+            { "value": "truck",   "label": "Livraison" },
+            { "value": "recycle", "label": "Retours" }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "100 % naturel"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "KNR Product Main",
+      "blocks": [
+        { "type": "accordion", "settings": { "heading": "Description",      "content_source": "product_desc" } },
+        { "type": "accordion", "settings": { "heading": "Bienfaits",         "content_source": "benefits" } },
+        { "type": "accordion", "settings": { "heading": "Ingrédients clés", "content_source": "ingredients" } },
+        { "type": "accordion", "settings": { "heading": "Adapté aux peaux", "content_source": "skin_types" } },
+        { "type": "reassurance", "settings": { "icon": "leaf",    "label": "97 % naturel" } },
+        { "type": "reassurance", "settings": { "icon": "shield",  "label": "Certifié bio" } },
+        { "type": "reassurance", "settings": { "icon": "truck",   "label": "Livraison offerte" } },
+        { "type": "reassurance", "settings": { "icon": "recycle", "label": "Retours 30 j" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

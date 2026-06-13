@@ -1,0 +1,333 @@
+<style>
+  .knr-footer {
+    background: var(--knr-sand-dark);
+    border-top: 1px solid var(--knr-border);
+    font-family: var(--knr-font);
+    padding: 52px 40px 32px;
+    width: 100%;
+    max-width: {{ section.settings.section_max_width }}px;
+    margin: 0 auto;
+  }
+
+  .knr-footer__inner {
+    max-width: {{ section.settings.section_max_width }}px;
+    margin: 0 auto;
+  }
+
+  .knr-footer__top {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 40px;
+    margin-bottom: 48px;
+  }
+
+ .knr-footer__col-title {
+    /* font-size: 10px; */
+    /* letter-spacing: .12em; */
+    /* text-transform: uppercase; */
+    color: var(--knr-ink);
+    margin-bottom: 16px;
+    /* font-weight: 500; */
+    font-family: Inter;
+    font-weight: 400;
+    font-style: Regular;
+    font-size: 14px;
+    leading-trim: NONE;
+    line-height: 14px;
+    letter-spacing: -2%;
+    /* text-align: center; */
+    vertical-align: middle;
+    text-transform: uppercase;
+}
+
+  .knr-footer__col-links {
+ display: flex; 
+    flex-direction: column;
+    gap: 9px;
+  }
+
+ .knr-footer__link {
+    /* font-size: var(--knr-text-12); */
+    /* color: var(--knr-ink-60); */
+    transition: color .15s;
+    font-family: Inter;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 20px;
+    letter-spacing: -2%;
+    vertical-align: middle;
+}
+  .knr-footer__link:hover { color: var(--knr-ink); }
+
+  .knr-footer__bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 28px;
+    border-top: 1px solid var(--knr-border);
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .knr-footer__logo {
+    font-size: 28px;
+    font-weight: 300;
+    letter-spacing: .16em;
+    text-transform: lowercase;
+    color: var(--knr-ink);
+    font-family: var(--knr-font);
+  }
+
+  .knr-footer__social {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+  }
+
+  .knr-footer__social a {
+    color: var(--knr-ink-60);
+    transition: color .15s;
+    display: flex;
+  }
+
+  .knr-footer__social a:hover { color: var(--knr-ink); }
+
+  .knr-footer__social svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    stroke-width: 1.4;
+    fill: none;
+  }
+
+  .knr-footer__legal {
+    font-size: 10px;
+    color: var(--knr-ink-60);
+    letter-spacing: .04em;
+    text-align: center;
+    width: 100%;
+    margin-top: 18px;
+  }
+
+  /* Indicators + subtitle — desktop: hidden */
+  .knr-footer__indicators { display: none; }
+  .knr-footer__slide-sub  { display: none; }
+
+  @media (max-width: 860px) {
+    /* Remove footer side padding — slider handles its own spacing */
+    .knr-footer { padding: 0 0 28px; }
+
+    /* ---- Slider viewport ---- */
+    .knr-footer__viewport {
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+      border-bottom: 1px solid var(--knr-border);
+    }
+    .knr-footer__viewport::-webkit-scrollbar { display: none; }
+
+    /* Grid → horizontal flex */
+    .knr-footer__top {
+      display: flex;
+      gap: 0;
+      margin-bottom: 0;
+    }
+
+    /* Each column = full-width centered slide */
+    .knr-footer__col {
+      flex: 0 0 100%;
+      min-height: 52vw;
+      scroll-snap-align: start;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 0px 40px;
+    }
+
+    /* Heading: bigger on mobile slide */
+    .knr-footer__col-title {
+      font-size: 14px;
+      letter-spacing: 0.14em;
+      margin-bottom: 20px;
+    }
+
+    /* Subtitle: visible on mobile */
+    .knr-footer__slide-sub {
+      display: block;
+      font-size: 15px;
+      line-height: 1.65;
+      color: var(--knr-ink);
+      max-width: 280px;
+      margin: 0;
+    }
+
+    /* Hide link list on mobile */
+    .knr-footer__col-links { display: block; 
+   } 
+
+    /* ---- Dash indicators ---- */
+    .knr-footer__indicators {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      padding: 24px 20px;
+    }
+    .knr-footer__dash {
+      width: 36px;
+      height: 1px;
+      background: var(--knr-border, #e0d8cc);
+      transition: background 0.25s ease;
+    }
+    .knr-footer__dash.is-active {
+      background: var(--knr-ink, #111);
+    }
+
+    .knr-footer__bottom { flex-direction: column; text-align: center; }
+  }
+</style>
+
+<footer class="knr-footer" role="contentinfo">
+
+  {%- comment -%}── Slider viewport (desktop: passthrough, mobile: full-width scroll) ──{%- endcomment -%}
+  <div class="knr-footer__viewport">
+    <div class="knr-footer__top">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'column' -%}
+          <div class="knr-footer__col" {{ block.shopify_attributes }}>
+            <p class="knr-footer__col-title">{{ block.settings.heading }}</p>
+            {%- if block.settings.subtitle != blank -%}
+              <p class="knr-footer__slide-sub">{{ block.settings.subtitle }}</p>
+            {%- endif -%}
+            <nav class="knr-footer__col-links" aria-label="{{ block.settings.heading }}">
+              {%- if block.settings.menu != blank -%}
+                {%- for link in linklists[block.settings.menu].links -%}
+                  <a href="{{ link.url }}" class="knr-footer__link">{{ link.title }}</a>
+                {%- endfor -%}
+              {%- else -%}
+                {%- assign raw_links = block.settings.links | newline_to_br | split: '<br />' -%}
+                {%- for raw in raw_links -%}
+                  {%- assign parts = raw | split: '|' -%}
+                  <a href="{{ parts[1] | default: '#' | strip }}" class="knr-footer__link">{{ parts[0] | strip }}</a>
+                {%- endfor -%}
+              {%- endif -%}
+            </nav>
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  </div>
+
+  {%- comment -%}── Per-slide dash indicators (mobile only) ──{%- endcomment -%}
+  <div class="knr-footer__indicators" aria-hidden="true">
+    {%- assign dash_idx = 0 -%}
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'column' -%}
+        <span class="knr-footer__dash{% if dash_idx == 0 %} is-active{% endif %}"></span>
+        {%- assign dash_idx = dash_idx | plus: 1 -%}
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+
+  <div class="knr-footer__inner page-width">
+    {% comment %} <div class="knr-footer__bottom">
+      <a href="{{ routes.root_url }}" class="knr-footer__logo" aria-label="{{ shop.name }}">
+        {%- if section.settings.logo -%}
+          <img src="{{ section.settings.logo | image_url: width: 300 }}" alt="{{ shop.name }}" width="150" height="32" loading="lazy">
+        {%- else -%}
+          {{ shop.name }}
+        {%- endif -%}
+      </a>
+
+      <div class="knr-footer__social">
+        {%- if section.settings.instagram != blank -%}
+          <a href="{{ section.settings.instagram }}" aria-label="Instagram" rel="noopener noreferrer" target="_blank">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4.5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+          </a>
+        {%- endif -%}
+        {%- if section.settings.facebook != blank -%}
+          <a href="{{ section.settings.facebook }}" aria-label="Facebook" rel="noopener noreferrer" target="_blank">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 2h-3a4 4 0 00-4 4v3H8v4h3v8h4v-8h3l1-4h-4V6a1 1 0 011-1h3z"/></svg>
+          </a>
+        {%- endif -%}
+        {%- if section.settings.tiktok != blank -%}
+          <a href="{{ section.settings.tiktok }}" aria-label="TikTok" rel="noopener noreferrer" target="_blank">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 12a4 4 0 104 4V4a5 5 0 005 5"/></svg>
+          </a>
+        {%- endif -%}
+      </div>
+
+      <p class="knr-footer__legal">
+        &copy; {{ 'now' | date: '%Y' }} {{ shop.name }} &mdash; {{ section.settings.legal | default: 'Tous droits réservés' }}
+      </p>
+    </div> {% endcomment %}
+
+  </div>
+</footer>
+
+<script>
+(function () {
+  var section  = document.querySelector('#shopify-section-{{ section.id }}');
+  if (!section) return;
+  var viewport = section.querySelector('.knr-footer__viewport');
+  var dashes   = section.querySelectorAll('.knr-footer__dash');
+  if (!viewport || !dashes.length) return;
+
+  function updateDashes() {
+    if (window.innerWidth > 860) return;
+    var scrollable = viewport.scrollWidth - viewport.clientWidth;
+    if (scrollable <= 0) return;
+    var progress   = viewport.scrollLeft / scrollable;
+    var total      = dashes.length;
+    var activeIdx  = Math.round(progress * (total - 1));
+    dashes.forEach(function (d, i) {
+      d.classList.toggle('is-active', i === activeIdx);
+    });
+  }
+
+  viewport.addEventListener('scroll', updateDashes, { passive: true });
+  window.addEventListener('resize',   updateDashes, { passive: true });
+  setTimeout(updateDashes, 80);
+})();
+</script>
+
+{% schema %}
+{
+  "name": "KNR Footer",
+  "settings": [
+    { "type": "image_picker", "id": "logo",      "label": "Logo" },
+    { "type": "url",          "id": "instagram", "label": "Instagram URL" },
+    { "type": "url",          "id": "facebook",  "label": "Facebook URL" },
+    { "type": "url",          "id": "tiktok",    "label": "TikTok URL" },
+    { "type": "text",         "id": "legal",     "label": "Legal text", "default": "Tous droits réservés" },
+    { "type": "range",        "id": "section_max_width", "label": "Section max width", "min": 960, "max": 1680, "step": 20, "default": 1440 }
+  ],
+  "blocks": [
+    {
+      "type": "column",
+      "name": "Footer column",
+      "settings": [
+        { "type": "text",      "id": "heading",  "label": "Heading",                     "default": "Navigation" },
+        { "type": "textarea",  "id": "subtitle", "label": "Mobile slide description",     "info": "Shown below the heading on mobile. Leave blank to hide." },
+        { "type": "link_list", "id": "menu",     "label": "Menu (optional)" },
+        { "type": "textarea",  "id": "links",    "label": "Manual links (Label | /url, one per line)" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "KNR Footer",
+      "blocks": [
+        { "type": "column", "settings": { "heading": "Collections & offres", "links": "Toute la gamme | /collections/all\nNouveautés | /collections/nouveautes\nMeilleures ventes | /collections/meilleures-ventes\nCoffrets cadeaux | /collections/coffrets" } },
+        { "type": "column", "settings": { "heading": "Retours articles",     "links": "Politique de retour | /policies/refund-policy\nÉchanges | /pages/echanges\nService client | /pages/contact" } },
+        { "type": "column", "settings": { "heading": "Paiement sécurisé",   "links": "Visa / Mastercard | #\nPayPal | #\nApple Pay | #\nVirement | #" } },
+        { "type": "column", "settings": { "heading": "Espace client",       "links": "Mon compte | /account\nMes commandes | /account/orders\nParrainage | /pages/parrainage\nNewsletter | /pages/newsletter" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

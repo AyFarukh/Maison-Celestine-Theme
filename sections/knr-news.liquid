@@ -1,0 +1,209 @@
+<style>
+  .knr-news {
+    padding: 72px 28px;
+    background: var(--knr-sand);
+    font-family: var(--knr-font);
+  }
+
+  .knr-news__inner { max-width: 1360px; margin: 0 auto; }
+
+  .knr-news__hd {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 36px;
+  }
+
+  .knr-news__title {
+    font-size: var(--knr-text-28);
+    font-weight: 300;
+    letter-spacing: .06em;
+    color: var(--knr-ink);
+    margin: 0;
+  }
+
+  .knr-news__all {
+    font-size: var(--knr-text-11);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--knr-ink-60);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color .15s;
+  }
+
+  .knr-news__all:hover { color: var(--knr-ink); }
+
+  .knr-news__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+
+  .knr-news-card {}
+
+  .knr-news-card__img {
+    aspect-ratio: 3/4;
+    overflow: hidden;
+    background: var(--knr-sand-dark);
+    margin-bottom: 16px;
+  }
+
+  .knr-news-card__img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .45s ease;
+  }
+
+  .knr-news-card:hover .knr-news-card__img img { transform: scale(1.04); }
+
+  .knr-news-card__tag {
+    font-size: 10px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--knr-ink-60);
+    margin-bottom: 8px;
+  }
+
+  .knr-news-card__title {
+    font-size: var(--knr-text-14);
+    font-weight: 400;
+    color: var(--knr-ink);
+    line-height: 1.5;
+    margin: 0 0 10px;
+  }
+
+  .knr-news-card__title a { transition: opacity .15s; }
+  .knr-news-card__title a:hover { opacity: .6; }
+
+  .knr-news-card__excerpt {
+    font-size: var(--knr-text-12);
+    color: var(--knr-ink-60);
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  @media (max-width: 1000px) {
+    .knr-news__grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 600px) {
+    .knr-news { padding: 52px 20px; }
+    .knr-news__grid {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+
+    .knr-news-card__img { aspect-ratio: 16/10; }
+  }
+</style>
+
+<section class="knr-news">
+  <div class="knr-news__inner">
+
+    <div class="knr-news__hd">
+      <h2 class="knr-news__title">{{ section.settings.title }}</h2>
+      {%- if section.settings.blog != blank and section.settings.show_all_link -%}
+        <a href="{{ blogs[section.settings.blog].url }}" class="knr-news__all">
+          {{ section.settings.all_label | default: 'Voir tous les articles' }}
+        </a>
+      {%- endif -%}
+    </div>
+
+    <div class="knr-news__grid">
+      {%- if section.settings.blog != blank -%}
+        {%- for article in blogs[section.settings.blog].articles limit: section.settings.count -%}
+          <article class="knr-news-card">
+            {%- if article.image -%}
+              <div class="knr-news-card__img">
+                <a href="{{ article.url }}" tabindex="-1" aria-hidden="true">
+                  <img
+                    src="{{ article.image | image_url: width: 600 }}"
+                    alt="{{ article.image.alt | default: article.title | escape }}"
+                    width="400" height="533"
+                    loading="lazy"
+                  >
+                </a>
+              </div>
+            {%- endif -%}
+            <p class="knr-news-card__tag">{{ article.tags.first | default: section.settings.default_tag }}</p>
+            <h3 class="knr-news-card__title">
+              <a href="{{ article.url }}">{{ article.title }}</a>
+            </h3>
+            {%- if article.excerpt != blank -%}
+              <p class="knr-news-card__excerpt">{{ article.excerpt | strip_html | truncate: 90 }}</p>
+            {%- endif -%}
+          </article>
+        {%- endfor -%}
+
+      {%- else -%}
+        {%- comment -%} Fallback blocks if no blog connected {%- endcomment -%}
+        {%- for block in section.blocks -%}
+          <article class="knr-news-card" {{ block.shopify_attributes }}>
+            {%- if block.settings.image != blank -%}
+              <div class="knr-news-card__img">
+                <img
+                  src="{{ block.settings.image | image_url: width: 600 }}"
+                  alt="{{ block.settings.title | escape }}"
+                  width="400" height="533"
+                  loading="lazy"
+                >
+              </div>
+            {%- endif -%}
+            <p class="knr-news-card__tag">{{ block.settings.tag }}</p>
+            <h3 class="knr-news-card__title">
+              {%- if block.settings.link != blank -%}
+                <a href="{{ block.settings.link }}">{{ block.settings.title }}</a>
+              {%- else -%}
+                {{ block.settings.title }}
+              {%- endif -%}
+            </h3>
+            {%- if block.settings.excerpt != blank -%}
+              <p class="knr-news-card__excerpt">{{ block.settings.excerpt }}</p>
+            {%- endif -%}
+          </article>
+        {%- endfor -%}
+      {%- endif -%}
+    </div>
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "KNR Latest News",
+  "settings": [
+    { "type": "text",     "id": "title",       "label": "Title",            "default": "Latest news" },
+    { "type": "blog",     "id": "blog",        "label": "Blog" },
+    { "type": "range",    "id": "count",       "label": "Articles to show", "min": 2, "max": 6, "step": 1, "default": 4 },
+    { "type": "checkbox", "id": "show_all_link","label": "Show 'all articles' link", "default": true },
+    { "type": "text",     "id": "all_label",   "label": "All articles label","default": "Voir tous les articles" },
+    { "type": "text",     "id": "default_tag", "label": "Default tag",      "default": "Beauté" }
+  ],
+  "blocks": [
+    {
+      "type": "article",
+      "name": "Article (fallback)",
+      "settings": [
+        { "type": "image_picker", "id": "image",   "label": "Image" },
+        { "type": "text",         "id": "tag",     "label": "Tag",    "default": "Beauté" },
+        { "type": "text",         "id": "title",   "label": "Title",  "default": "12 ingrédients actifs sélectionnés" },
+        { "type": "textarea",     "id": "excerpt", "label": "Excerpt","default": "Découvrez les ingrédients qui composent notre formule d'exception." },
+        { "type": "url",          "id": "link",    "label": "Link" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "KNR Latest News",
+      "blocks": [
+        { "type": "article", "settings": { "tag": "Fondée en 2012",         "title": "Fondée en 2012 dans les Alpes",          "excerpt": "Maison Célestine est née d'une passion pour la science botanique et les actifs naturels d'altitude." } },
+        { "type": "article", "settings": { "tag": "Ingrédients",            "title": "12 ingrédients actifs sélectionnés",      "excerpt": "Chaque ingrédient est soigneusement sélectionné pour son efficacité prouvée." } },
+        { "type": "article", "settings": { "tag": "Science",                "title": "15 ans de recherche en lab",              "excerpt": "Nos formules sont le fruit de quinze années de recherche en dermatologie végétale." } },
+        { "type": "article", "settings": { "tag": "Naturalité",             "title": "97 % naturel",                           "excerpt": "Éthique et efficacité ne s'opposent pas." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

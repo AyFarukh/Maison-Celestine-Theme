@@ -1,0 +1,99 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "name": "Footer",
+  "type": "footer",
+  "sections": {
+    "mc-footer": {
+      "type": "mc-footer",
+      "blocks": {
+        "menu-col-1": {
+          "type": "menu_column",
+          "settings": {
+            "heading": "Découvrir",
+            "menu": "footer"
+          }
+        },
+        "menu-col-2": {
+          "type": "menu_column",
+          "settings": {
+            "heading": "Service client",
+            "menu": "service-client"
+          }
+        },
+        "menu-col-3": {
+          "type": "menu_column",
+          "settings": {
+            "heading": "Légal & Transparence",
+            "menu": "l-gal-transparence"
+          }
+        },
+        "about-col": {
+          "type": "about_column",
+          "settings": {
+            "heading": "À propos de Maison Célestine",
+            "about_text": "Maison Célestine est une marque de soins anti-âge haut de gamme formulée autour d'actifs rares et certifiés biologiques, guidée par une expertise médicale et un rituel simple, précis et efficace.",
+            "cert_image": "shopify://shop_images/Calque_1.png",
+            "cert_image_width": 56,
+            "cert_alt": "COSMOS ORGANIC",
+            "cert_text": "Certifié COSMOS ORGANIC par ECOCERT Greenlife",
+            "cert_link_text": "Voir le certificat",
+            "cert_link_url": "shopify://products/test4",
+            "cert_link_new_tab": true
+          }
+        }
+      },
+      "block_order": [
+        "menu-col-1",
+        "menu-col-2",
+        "menu-col-3",
+        "about-col"
+      ],
+      "settings": {
+        "background_color": "#f5f1ea",
+        "text_color": "#1a1a1a",
+        "border_color": "#d4cfc4",
+        "link_hover_color": "#555555",
+        "accordion_border_color": "#d4cfc4",
+        "full_width": false,
+        "max_width": 1680,
+        "column_gap": 40,
+        "padding_top_desktop": 64,
+        "padding_bottom_desktop": 0,
+        "padding_sides_desktop": 40,
+        "padding_top_mobile": 32,
+        "padding_bottom_mobile": 0,
+        "padding_sides_mobile": 20,
+        "logo_type": "image",
+        "logo_text": "maison célestine",
+        "logo_image": "shopify://shop_images/Union.png",
+        "logo_alt": "buib",
+        "logo_image_max_width": 100,
+        "logo_font_size_desktop": 8,
+        "logo_font_size_mobile": 23,
+        "logo_letter_spacing": -20,
+        "logo_alignment": "left",
+        "logo_spacing": 0,
+        "show_country_selector": true,
+        "show_language_selector": true,
+        "copyright_text": "",
+        "facebook_url": "#",
+        "instagram_url": "#",
+        "tiktok_url": "#",
+        "linkedin_url": "#",
+        "youtube_url": "",
+        "pinterest_url": ""
+      }
+    }
+  },
+  "order": [
+    "mc-footer"
+  ]
+}
