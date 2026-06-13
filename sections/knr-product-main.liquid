@@ -412,7 +412,7 @@
     border-color: var(--knr-pm-badge-text);
   }
 
-  /* Title + rating */
+  /* Title + mobile price */
   .knr-pm__title-row {
     display: flex;
     align-items: flex-start;
@@ -424,6 +424,7 @@
       color: var(--knr-ink);
       margin: 0;
       flex: 1;
+      min-width: 0;
       font-family: 'Inter', sans-serif;
       font-weight: 400;
       font-style: normal;
@@ -437,7 +438,7 @@
   .knr-pm__rating {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     gap: 3px;
     flex-shrink: 0;
     padding-top: 4px;
@@ -536,21 +537,39 @@
   }
 
   /* Price */
- .knr-pm__price {
-    font-size: 24px;
-    font-weight: 400;
-    color: var(--knr-ink);
-    letter-spacing: .01em;
+  .knr-pm__price-block {
+    text-align: left;
+  }
+
+  .knr-pm__price-block--mobile {
+    display: none;
+    flex: 0 0 auto;
+    text-align: right;
+    margin-left: auto;
+  }
+
+  .knr-pm__price-block--desktop {
     margin-top: 12px;
     margin-bottom: 30px;
-}
+  }
+
+  .knr-pm__price-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-start;
+    gap: 8px;
+    white-space: nowrap;
+  }
+
+  .knr-pm__price-block--mobile .knr-pm__price-row {
+    justify-content: flex-end;
+  }
 
   .knr-pm__price {
     font-size: 24px;
     font-weight: 400;
     color: var(--knr-ink);
     letter-spacing: .01em;
-
   }
 
   .knr-pm__compare {
@@ -562,7 +581,7 @@
   .knr-pm__unit-price {
     font-size: 11px;
     color: var(--knr-ink-60);
-    margin: 0 0 18px;
+    margin: 6px 0 0;
     letter-spacing: .02em;
   }
 
@@ -768,6 +787,7 @@
     margin-top: 24px;
     padding-top: 18px;
     border-top: 1px solid var(--knr-border);
+    overflow: hidden;
   }
 
   .knr-pm__ritual-hd {
@@ -778,9 +798,10 @@
   }
 
   .knr-pm__ritual-title {
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: .14em;
+    font-size: 18px;
+    line-height: 1.2;
+    font-weight: 400;
+    letter-spacing: 0;
     text-transform: uppercase;
     color: var(--knr-ink);
     margin: 0;
@@ -799,37 +820,41 @@
   .knr-pm__ritual-next:hover { transform: translateX(3px); }
 
   .knr-pm__ritual-next svg {
-    width: 16px;
-    height: 16px;
+    width: 22px;
+    height: 22px;
     stroke: currentColor;
-    stroke-width: 1.8;
+    stroke-width: 2.5;
     fill: none;
   }
 
   .knr-pm__ritual-track {
-    display: block;
-    gap: 10px;
+    display: flex;
+    gap: 18px;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
     cursor: grab;
+    padding-bottom: 12px;
   }
 
   .knr-pm__ritual-track::-webkit-scrollbar { display: none; }
   .knr-pm__ritual-track.is-dragging { cursor: grabbing; scroll-snap-type: none; }
 
   .knr-pm__ritual-card {
-    flex: 0 0 calc(33.333% - 7px);
+    flex: 0 0 calc(50% - 9px);
     scroll-snap-align: start;
+    min-width: 0;
   }
 
   .knr-pm__ritual-img {
-    aspect-ratio: 3/4;
+    aspect-ratio: 1 / 1.3;
     overflow: hidden;
     background: var(--knr-sand-dark);
-    margin-bottom: 9px;
+    margin-bottom: 12px;
     position: relative;
+    border-bottom: 1px solid var(--knr-ink);
   }
 
   .knr-pm__ritual-img img {
@@ -844,26 +869,55 @@
   .knr-pm__ritual-qadd.loading,
   .knr-pm__ritual-qadd.added { opacity: 1; }
 
+  .knr-pm__ritual-meta {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+    align-items: baseline;
+  }
+
   .knr-pm__ritual-name {
-    font-size: 11px;
+    font-size: 16px;
+    line-height: 1.2;
     font-weight: 400;
     color: var(--knr-ink);
-    margin: 0 0 3px;
+    margin: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    letter-spacing: .02em;
+    letter-spacing: 0;
   }
 
   .knr-pm__ritual-price {
-    font-size: 11px;
-    color: var(--knr-ink-60);
+    font-size: 16px;
+    line-height: 1.2;
+    color: var(--knr-ink);
     margin: 0;
+    white-space: nowrap;
   }
 
   .knr-pm__ritual-compare {
     text-decoration: line-through;
     margin-left: 5px;
+  }
+
+  .knr-pm__ritual-progress {
+    position: relative;
+    width: 88px;
+    height: 2px;
+    margin: 8px auto 0;
+    background: rgba(17, 17, 17, .16);
+    overflow: hidden;
+  }
+
+  .knr-pm__ritual-progress-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 34%;
+    height: 100%;
+    background: var(--knr-ink);
+    transition: width .18s ease, left .18s ease;
   }
 
   /* ─── Responsive ─── */
@@ -887,11 +941,65 @@
       margin: 0 16px;
     }
 
-    .knr-pm__title { font-size: 14px; }
+    .knr-pm__title {
+      font-size: 14px;
+      line-height: 20px;
+    }
+
     .knr-pm__price { font-size: 14px; }
+    .knr-pm__compare { font-size: 11px; }
+    .knr-pm__unit-price { font-size: 10px; }
+    .knr-pm__price-block--desktop { display: none; }
+    .knr-pm__price-block--mobile { display: block; }
+
+    .knr-pm__option-label {
+      font-size: 28px;
+      line-height: 1.2;
+      letter-spacing: 0;
+      margin-bottom: 24px;
+    }
+
+    .knr-pm__option-pills {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0;
+      width: 100%;
+    }
+
+    .knr-pm__opt-pill {
+      width: 100%;
+      min-height: 42px;
+      border-bottom-width: 2px;
+      font-size: 28px;
+      line-height: 1.15;
+      text-align: center;
+    }
+
+    .knr-pm__opt-pill.is-selected {
+      font-size: 28px;
+      line-height: 1.15;
+    }
+
+    .knr-pm__ritual {
+      margin-top: 64px;
+      padding-top: 0;
+      border-top: none;
+    }
+
+    .knr-pm__ritual-hd {
+      margin-bottom: 28px;
+    }
+
+    .knr-pm__ritual-title {
+      font-size: 16px;
+    }
+
+    .knr-pm__ritual-track {
+      gap: 12px;
+    }
 
     .knr-pm__ritual-card {
-      flex: 0 0 calc(50% - 5px);
+      flex: 0 0 calc(50% - 6px);
     }
     .knr-pm__crumb {
     display: none;
@@ -902,13 +1010,23 @@
     justify-content: space-between;
     gap: 14px;
     margin-bottom: 10px;
-    flex-direction: column;
 }
   }
 
   @media (max-width: 600px) {
     .knr-pm__ritual-card {
-      flex: 0 0 calc(75% - 5px);
+      flex: 0 0 100%;
+    }
+
+    .knr-pm__ritual-title {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: .14em;
+    }
+
+    .knr-pm__ritual-name,
+    .knr-pm__ritual-price {
+      font-size: 16px;
     }
     .knr-pm__badges {
     display: flex;
@@ -1106,28 +1224,50 @@
       </div>
     {%- endif -%}
 
-    <!-- Title + Rating -->
+    <!-- Title + mobile price -->
     <div class="knr-pm__title-row">
       <h1 class="knr-pm__title" itemprop="name">{{ product.title }}</h1>
 
-      {%- if section.settings.show_rating -%}
-        <div class="knr-pm__rating" aria-label="{{ section.settings.rating_score }} étoiles sur 5">
-          <div class="knr-pm__stars" aria-hidden="true">
-            {%- assign rscore = section.settings.rating_score | plus: 0 | floor -%}
-            {%- for i in (1..5) -%}
-              <svg viewBox="0 0 12 12"
-                fill="{% if i <= rscore %}var(--knr-gold){% else %}none{% endif %}"
-                stroke="var(--knr-gold)"
-                stroke-width="1.2"
-              >
-                <path d="M6 1l1.4 2.8 3.1.5-2.3 2.2.6 3.1L6 8.1 3.2 9.6l.6-3.1L1.5 4.3l3.1-.5z"/>
-              </svg>
-            {%- endfor -%}
-          </div>
-          <div class="knr-pm__review-count">{{ section.settings.rating_count }} avis</div>
+      <div class="knr-pm__price-block knr-pm__price-block--mobile" aria-label="Prix">
+        <div class="knr-pm__price-row">
+          <span class="knr-pm__price" data-knr-price>{{ current_variant.price | money }}</span>
+          {%- if current_variant.compare_at_price > current_variant.price -%}
+            <span class="knr-pm__compare" data-knr-compare>{{ current_variant.compare_at_price | money }}</span>
+          {%- else -%}
+            <span class="knr-pm__compare" data-knr-compare hidden></span>
+          {%- endif -%}
         </div>
-      {%- endif -%}
+        {%- if current_variant.unit_price_measurement -%}
+          <p class="knr-pm__unit-price" data-knr-unit-price>
+            {{ current_variant.unit_price | money }}
+            {%- if current_variant.unit_price_measurement.reference_value != 1 -%}
+              {{ current_variant.unit_price_measurement.reference_value }}
+            {%- endif -%}
+            {{ current_variant.unit_price_measurement.reference_unit }}
+          </p>
+        {%- else -%}
+          <p class="knr-pm__unit-price" data-knr-unit-price hidden></p>
+        {%- endif -%}
+      </div>
     </div>
+
+    {%- if section.settings.show_rating -%}
+      <div class="knr-pm__rating" aria-label="{{ section.settings.rating_score }} étoiles sur 5">
+        <div class="knr-pm__stars" aria-hidden="true">
+          {%- assign rscore = section.settings.rating_score | plus: 0 | floor -%}
+          {%- for i in (1..5) -%}
+            <svg viewBox="0 0 12 12"
+              fill="{% if i <= rscore %}var(--knr-gold){% else %}none{% endif %}"
+              stroke="var(--knr-gold)"
+              stroke-width="1.2"
+            >
+              <path d="M6 1l1.4 2.8 3.1.5-2.3 2.2.6 3.1L6 8.1 3.2 9.6l.6-3.1L1.5 4.3l3.1-.5z"/>
+            </svg>
+          {%- endfor -%}
+        </div>
+        <div class="knr-pm__review-count">{{ section.settings.rating_count }} avis</div>
+      </div>
+    {%- endif -%}
 
     <!-- Certifications line -->
     {%- if section.settings.certifications != blank -%}
@@ -1163,18 +1303,18 @@
       </div>
     {%- endif -%}
 
-    <!-- Price -->
-    <div id="knrPmPriceBlock-{{ section.id }}">
+    <!-- Desktop price -->
+    <div class="knr-pm__price-block knr-pm__price-block--desktop" id="knrPmPriceBlock-{{ section.id }}">
       <div class="knr-pm__price-row">
-        <span class="knr-pm__price" id="knrPmPrice-{{ section.id }}">{{ current_variant.price | money }}</span>
+        <span class="knr-pm__price" id="knrPmPrice-{{ section.id }}" data-knr-price>{{ current_variant.price | money }}</span>
         {%- if current_variant.compare_at_price > current_variant.price -%}
-          <span class="knr-pm__compare" id="knrPmCompare-{{ section.id }}">{{ current_variant.compare_at_price | money }}</span>
+          <span class="knr-pm__compare" id="knrPmCompare-{{ section.id }}" data-knr-compare>{{ current_variant.compare_at_price | money }}</span>
         {%- else -%}
-          <span class="knr-pm__compare" id="knrPmCompare-{{ section.id }}" hidden></span>
+          <span class="knr-pm__compare" id="knrPmCompare-{{ section.id }}" data-knr-compare hidden></span>
         {%- endif -%}
       </div>
       {%- if current_variant.unit_price_measurement -%}
-        <p class="knr-pm__unit-price" id="knrPmUnitPrice-{{ section.id }}">
+        <p class="knr-pm__unit-price" id="knrPmUnitPrice-{{ section.id }}" data-knr-unit-price>
           {{ current_variant.unit_price | money }}
           {%- if current_variant.unit_price_measurement.reference_value != 1 -%}
             {{ current_variant.unit_price_measurement.reference_value }}
@@ -1182,7 +1322,7 @@
           {{ current_variant.unit_price_measurement.reference_unit }}
         </p>
       {%- else -%}
-        <p class="knr-pm__unit-price" id="knrPmUnitPrice-{{ section.id }}" hidden></p>
+        <p class="knr-pm__unit-price" id="knrPmUnitPrice-{{ section.id }}" data-knr-unit-price hidden></p>
       {%- endif -%}
     </div>
 
@@ -1323,26 +1463,31 @@
                 class="knr-pm__ritual-qadd"
                 type="button"
                 data-ritual-add
-                data-vid="{{ product.selected_or_first_available_variant.id }}"
-                data-product-id="{{ product.id }}"
-                data-product-handle="{{ product.handle }}"
-                data-product-title="{{ product.title | escape }}"
+                data-vid="{{ rv.id }}"
+                data-product-id="{{ rp.id }}"
+                data-product-handle="{{ rp.handle }}"
+                data-product-title="{{ rp.title | escape }}"
                 data-default-label="+"
-                aria-label="Ajouter {{ product.title | escape }}"
+                aria-label="Ajouter {{ rp.title | escape }}"
               >
                 +
               </button>
                 {%- endif -%}
               </div>
-              <p class="knr-pm__ritual-name">{{ rp.title }}</p>
-              <p class="knr-pm__ritual-price">
-                {{ rv.price | money }}
-                {%- if rv.compare_at_price > rv.price -%}
-                  <span class="knr-pm__ritual-compare">{{ rv.compare_at_price | money }}</span>
-                {%- endif -%}
-              </p>
+              <div class="knr-pm__ritual-meta">
+                <p class="knr-pm__ritual-name">{{ rp.title }}</p>
+                <p class="knr-pm__ritual-price">
+                  {{ rv.price | money }}
+                  {%- if rv.compare_at_price > rv.price -%}
+                    <span class="knr-pm__ritual-compare">{{ rv.compare_at_price | money }}</span>
+                  {%- endif -%}
+                </p>
+              </div>
             </div>
           {%- endfor -%}
+        </div>
+        <div class="knr-pm__ritual-progress" aria-hidden="true">
+          <span class="knr-pm__ritual-progress-bar" id="knrRitualProgress-{{ section.id }}"></span>
         </div>
       </div>
     {%- endif -%}
@@ -1568,15 +1713,14 @@
       selectedOpts = [...variant.options];
       updateOptionButtons();
 
-      const priceEl = sectionEl.querySelector('#knrPmPrice-{{ section.id }}');
-      const compareEl = sectionEl.querySelector('#knrPmCompare-{{ section.id }}');
-      const unitEl = sectionEl.querySelector('#knrPmUnitPrice-{{ section.id }}');
       const varInput = sectionEl.querySelector('#knrPmVarId-{{ section.id }}');
       const atcLbl = mainAtcBtn?.querySelector('.knr-pm__atc-lbl');
 
-      if (priceEl) priceEl.textContent = fmtMoney(variant.price);
+      sectionEl.querySelectorAll('[data-knr-price]').forEach(priceEl => {
+        priceEl.textContent = fmtMoney(variant.price);
+      });
 
-      if (compareEl) {
+      sectionEl.querySelectorAll('[data-knr-compare]').forEach(compareEl => {
         if (variant.compare_at_price && variant.compare_at_price > variant.price) {
           compareEl.textContent = fmtMoney(variant.compare_at_price);
           compareEl.hidden = false;
@@ -1584,9 +1728,9 @@
           compareEl.hidden = true;
           compareEl.textContent = '';
         }
-      }
+      });
 
-      if (unitEl) {
+      sectionEl.querySelectorAll('[data-knr-unit-price]').forEach(unitEl => {
         if (variant.unit_price_measurement) {
           const refValue = variant.unit_price_measurement.reference_value;
           const refUnit = variant.unit_price_measurement.reference_unit || '';
@@ -1597,7 +1741,7 @@
           unitEl.hidden = true;
           unitEl.textContent = '';
         }
-      }
+      });
 
       if (varInput) varInput.value = variant.id;
       if (mainAtcBtn) {
@@ -1764,7 +1908,28 @@
     // Ritual slider — drag + arrow
     const track = document.getElementById('knrRitualTrack-{{ section.id }}');
     if (track) {
+      const progressBar = document.getElementById('knrRitualProgress-{{ section.id }}');
       let isDragging = false, startX = 0, scrollStart = 0;
+      let progressRaf = null;
+
+      const updateRitualProgress = () => {
+        progressRaf = null;
+        if (!progressBar) return;
+
+        const maxScroll = Math.max(0, track.scrollWidth - track.clientWidth);
+        const visibleRatio = track.scrollWidth ? track.clientWidth / track.scrollWidth : 1;
+        const barWidth = Math.min(100, Math.max(18, visibleRatio * 100));
+        const scrollRatio = maxScroll ? track.scrollLeft / maxScroll : 0;
+        const maxTravel = 100 - barWidth;
+
+        progressBar.style.width = `${barWidth}%`;
+        progressBar.style.left = `${scrollRatio * maxTravel}%`;
+      };
+
+      const queueRitualProgress = () => {
+        if (progressRaf) return;
+        progressRaf = window.requestAnimationFrame(updateRitualProgress);
+      };
 
       track.addEventListener('mousedown', e => {
         if (e.target.closest('.knr-pm__ritual-qadd')) return;
@@ -1782,6 +1947,7 @@
         if (!isDragging) return;
         e.preventDefault();
         track.scrollLeft = scrollStart - (e.pageX - startX);
+        queueRitualProgress();
       });
 
       track.addEventListener('touchstart', e => {
@@ -1798,6 +1964,7 @@
         const touch = e.touches[0];
         if (!touch) return;
         track.scrollLeft = scrollStart - (touch.pageX - startX);
+        queueRitualProgress();
       }, { passive: true });
 
       track.addEventListener('touchend', () => {
@@ -1806,8 +1973,17 @@
 
       document.getElementById('knrRitualNext-{{ section.id }}')?.addEventListener('click', () => {
         const card = track.querySelector('.knr-pm__ritual-card');
-        if (card) track.scrollBy({ left: card.offsetWidth + 10, behavior: 'smooth' });
+        if (!card) return;
+
+        const step = card.offsetWidth + 18;
+        const maxScroll = Math.max(0, track.scrollWidth - track.clientWidth);
+        const nextLeft = track.scrollLeft + step >= maxScroll - 2 ? 0 : track.scrollLeft + step;
+        track.scrollTo({ left: nextLeft, behavior: 'smooth' });
       });
+
+      track.addEventListener('scroll', queueRitualProgress, { passive: true });
+      window.addEventListener('resize', queueRitualProgress);
+      updateRitualProgress();
     }
 
     // Accordions
