@@ -2232,7 +2232,50 @@
     })();
   })();
 </script>
+<script>
+document.addEventListener('click', async function (e) {
+  const btn = e.target.closest('[data-ritual-add]');
+  if (!btn) return;
 
+  const variantId = btn.dataset.vid;
+  if (!variantId) return;
+
+  btn.disabled = true;
+  btn.textContent = '...';
+
+  try {
+    const res = await fetch('/cart/add.js', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        id: Number(variantId),
+        quantity: 1
+      })
+    });
+
+    if (!res.ok) throw new Error('Add to cart failed');
+
+    btn.textContent = '✓';
+
+    document.dispatchEvent(new CustomEvent('cart:refresh'));
+    document.dispatchEvent(new CustomEvent('cart:open'));
+
+    setTimeout(() => {
+      btn.textContent = btn.dataset.defaultLabel || '+';
+      btn.disabled = false;
+    }, 1200);
+
+  } catch (err) {
+    console.error(err);
+    btn.textContent = '+';
+    btn.disabled = false;
+    alert('Product could not be added to cart.');
+  }
+});
+</script>
 {% schema %}
 {
   "name": "KNR Product Main",
