@@ -349,9 +349,9 @@
 .knr-pm__info {
     position: absolute;
     top: 181px;
-    /* max-height: 100%; */
-    /* overflow-y: auto; */
-    max-height: calc(100vh -);
+    max-height: calc(100svh - 28px);
+    overflow-y: auto;
+    overflow-x: hidden;
     scrollbar-width: none;
     padding: 40px;
     border-left: 1px solid var(--knr-border);
@@ -359,6 +359,8 @@
     background: #FFFFFF;
     right: -14px;
     z-index: 1000;
+    box-sizing: border-box;
+    min-width: 0;
 }
   .knr-pm__info::-webkit-scrollbar { display: none; }
 
@@ -793,6 +795,9 @@
     padding-top: 18px;
     border-top: 1px solid var(--knr-border);
     overflow: hidden;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
   }
 
   .knr-pm__ritual-hd {
@@ -836,22 +841,29 @@
 
   .knr-pm__ritual-track {
     display: flex;
-    gap: 18px;
+    gap: 14px;
     overflow-x: auto;
+    overflow-y: hidden;
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
     cursor: grab;
     padding-bottom: 12px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overscroll-behavior-x: contain;
+    touch-action: pan-x;
   }
 
   .knr-pm__ritual-track::-webkit-scrollbar { display: none; }
   .knr-pm__ritual-track.is-dragging { cursor: grabbing; scroll-snap-type: none; }
 
   .knr-pm__ritual-card {
-    flex: 0 0 calc(50% - 9px);
+    flex: 0 0 calc((100% - 14px) / 2);
     scroll-snap-align: start;
+    scroll-snap-stop: always;
     min-width: 0;
   }
 
@@ -942,12 +954,13 @@
       height: auto;
       max-height: none;
       overflow-y: visible;
+      overflow-x: hidden;
       padding: 24px 20px 48px;
       border-left: none;
       border-right: none;
       transform: none;
       margin: 16px 16px;
-      width:345px;
+   
     }
 
     .knr-pm__title {
@@ -1012,10 +1025,12 @@
 }
     .knr-pm__ritual-track {
       gap: 12px;
+      width: 100%;
+      max-width: 100%;
     }
 
     .knr-pm__ritual-card {
-      flex: 0 0 calc(50% - 6px);
+      flex: 0 0 calc((100% - 12px) / 2);
     }
     .knr-pm__crumb {
     display: none;
@@ -1030,9 +1045,9 @@
   }
 
   @media (max-width: 600px) {
-    {% comment %} .knr-pm__ritual-card {
+    .knr-pm__ritual-card {
       flex: 0 0 100%;
-    } {% endcomment %}
+    }
 
    .knr-pm__ritual-title {
     font-size: 12px;
@@ -1085,15 +1100,18 @@
       .knr-pm__info {
     position: absolute;
     top: 181px;
-    /* max-height: 100%; */
-    /* overflow-y: auto; */
-    max-height: calc(100vh -);
+    max-height: calc(100svh - 28px);
+    overflow-y: auto;
+    overflow-x: hidden;
     scrollbar-width: none;
     padding: 40px;
     border-left: 1px solid var(--knr-border);
     transform: translateX(-57px);
     background: #FFFFFF;
     width: 456px;
+    max-width: calc(100vw - 32px);
+    box-sizing: border-box;
+    min-width: 0;
     /* left: 109px; */
     right: -14px;
     z-index: 1000;
@@ -2012,7 +2030,9 @@
         const card = track.querySelector('.knr-pm__ritual-card');
         if (!card) return;
 
-        const step = card.offsetWidth + 18;
+        const trackStyles = window.getComputedStyle(track);
+        const gap = Number.parseFloat(trackStyles.columnGap || trackStyles.gap || '0') || 0;
+        const step = card.getBoundingClientRect().width + gap;
         const maxScroll = Math.max(0, track.scrollWidth - track.clientWidth);
         const nextLeft = track.scrollLeft + step >= maxScroll - 2 ? 0 : track.scrollLeft + step;
         track.scrollTo({ left: nextLeft, behavior: 'smooth' });
@@ -2211,50 +2231,6 @@
       else hero.addEventListener('load', apply);
     })();
   })();
-</script>
-<script>
-document.addEventListener('click', async function (e) {
-  const btn = e.target.closest('[data-ritual-add]');
-  if (!btn) return;
-
-  const variantId = btn.dataset.vid;
-  if (!variantId) return;
-
-  btn.disabled = true;
-  btn.textContent = '...';
-
-  try {
-    const res = await fetch('/cart/add.js', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify({
-        id: Number(variantId),
-        quantity: 1
-      })
-    });
-
-    if (!res.ok) throw new Error('Add to cart failed');
-
-    btn.textContent = '✓';
-
-    document.dispatchEvent(new CustomEvent('cart:refresh'));
-    document.dispatchEvent(new CustomEvent('cart:open'));
-
-    setTimeout(() => {
-      btn.textContent = btn.dataset.defaultLabel || '+';
-      btn.disabled = false;
-    }, 1200);
-
-  } catch (err) {
-    console.error(err);
-    btn.textContent = '+';
-    btn.disabled = false;
-    alert('Product could not be added to cart.');
-  }
-});
 </script>
 {% schema %}
 {
