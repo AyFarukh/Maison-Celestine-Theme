@@ -3645,8 +3645,8 @@ details-disclosure > details {
     justify-content: center;
     align-items: center;
     font-size: .9rem;
-    bottom: 1.8rem;
-    left: 2.2rem;
+    bottom: 2.3rem;
+    left: 1.0rem;
     line-height: calc(1 + .1 / var(--font-body-scale));
 }
 
@@ -3654,10 +3654,7 @@ details-disclosure > details {
 
     justify-content: flex-start !important;
 }
-.cart-count-bubble {
-    bottom: 2.3rem;
-left: 1.0rem;
-}
+
 }
 .knr-pm__media-item[data-tag=“mobile-image”] {
   display: none;
